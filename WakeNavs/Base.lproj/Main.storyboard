@@ -41,16 +41,27 @@
                                     <constraint firstAttribute="trailing" secondItem="7d9-dp-6nV" secondAttribute="trailing" constant="60" id="sa6-QZ-PBN"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8ZW-v4-yjg" customClass="GMSMapView">
+                                <rect key="frame" x="0.0" y="96" width="600" height="455"/>
+                                <color key="backgroundColor" red="0.79505699094746074" green="0.97705586470060724" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="8ZW-v4-yjg" firstAttribute="top" secondItem="Ia1-K6-d13" secondAttribute="bottom" constant="76" id="0ZQ-52-0UX"/>
                             <constraint firstItem="wiz-6t-igq" firstAttribute="leading" secondItem="tsR-hK-woN" secondAttribute="leading" id="BDl-wo-WQM"/>
+                            <constraint firstItem="8ZW-v4-yjg" firstAttribute="bottom" secondItem="4ug-Mw-9AY" secondAttribute="top" id="KTp-Dh-vey"/>
                             <constraint firstItem="wiz-6t-igq" firstAttribute="top" secondItem="Ia1-K6-d13" secondAttribute="bottom" id="Q6d-II-c3b"/>
                             <constraint firstAttribute="trailing" secondItem="wiz-6t-igq" secondAttribute="trailing" id="d6T-M1-da0"/>
                             <constraint firstItem="4ug-Mw-9AY" firstAttribute="top" secondItem="wiz-6t-igq" secondAttribute="bottom" constant="454" id="hi5-lU-sAz"/>
+                            <constraint firstItem="8ZW-v4-yjg" firstAttribute="leading" secondItem="wiz-6t-igq" secondAttribute="leading" id="p6v-dY-Srf"/>
+                            <constraint firstItem="8ZW-v4-yjg" firstAttribute="trailing" secondItem="wiz-6t-igq" secondAttribute="trailing" id="pv6-eq-kLh"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Building" image="first" id="acW-dT-cKf"/>
+                    <connections>
+                        <outlet property="mapView" destination="8ZW-v4-yjg" id="EcG-au-du0"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
