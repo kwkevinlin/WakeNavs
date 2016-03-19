@@ -1,5 +1,5 @@
 //
-//  SecondViewController.swift
+//  ParkingViewController.swift
 //  WakeNavs
 //
 //  Created by Kevin Lin on 3/18/16.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SecondViewController: UIViewController {
+class ParkingViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

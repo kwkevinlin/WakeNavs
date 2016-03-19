@@ -1,5 +1,5 @@
 //
-//  FirstViewController.swift
+//  BuildingViewController.swift
 //  WakeNavs
 //
 //  Created by Kevin Lin on 3/18/16.
@@ -11,7 +11,7 @@ import GoogleMaps
 import CoreLocation
 
 
-class FirstViewController: UIViewController, CLLocationManagerDelegate {
+class BuildingViewController: UIViewController, CLLocationManagerDelegate {
 
     @IBOutlet weak var mapView: GMSMapView!
     

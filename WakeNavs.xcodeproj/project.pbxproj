@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		3FCE087C09B1A78C01C399E5 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7B54AF8CF67413C5D74C6E7 /* libPods.a */; };
 		77209E6D1C9CFA870056A4FC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77209E6C1C9CFA870056A4FC /* AppDelegate.swift */; };
-		77209E6F1C9CFA870056A4FC /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77209E6E1C9CFA870056A4FC /* FirstViewController.swift */; };
-		77209E711C9CFA870056A4FC /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77209E701C9CFA870056A4FC /* SecondViewController.swift */; };
+		77209E6F1C9CFA870056A4FC /* BuildingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77209E6E1C9CFA870056A4FC /* BuildingViewController.swift */; };
+		77209E711C9CFA870056A4FC /* ParkingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77209E701C9CFA870056A4FC /* ParkingViewController.swift */; };
 		77209E741C9CFA870056A4FC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 77209E721C9CFA870056A4FC /* Main.storyboard */; };
 		77209E761C9CFA870056A4FC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77209E751C9CFA870056A4FC /* Assets.xcassets */; };
 		77209E791C9CFA870056A4FC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 77209E771C9CFA870056A4FC /* LaunchScreen.storyboard */; };
@@ -21,8 +21,8 @@
 		439E81D021011AEEDBDAD851 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		77209E691C9CFA870056A4FC /* WakeNavs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WakeNavs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		77209E6C1C9CFA870056A4FC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		77209E6E1C9CFA870056A4FC /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
-		77209E701C9CFA870056A4FC /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
+		77209E6E1C9CFA870056A4FC /* BuildingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingViewController.swift; sourceTree = "<group>"; };
+		77209E701C9CFA870056A4FC /* ParkingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParkingViewController.swift; sourceTree = "<group>"; };
 		77209E731C9CFA870056A4FC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		77209E751C9CFA870056A4FC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		77209E781C9CFA870056A4FC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -75,8 +75,8 @@
 			isa = PBXGroup;
 			children = (
 				77209E6C1C9CFA870056A4FC /* AppDelegate.swift */,
-				77209E6E1C9CFA870056A4FC /* FirstViewController.swift */,
-				77209E701C9CFA870056A4FC /* SecondViewController.swift */,
+				77209E6E1C9CFA870056A4FC /* BuildingViewController.swift */,
+				77209E701C9CFA870056A4FC /* ParkingViewController.swift */,
 				77209E721C9CFA870056A4FC /* Main.storyboard */,
 				77209E751C9CFA870056A4FC /* Assets.xcassets */,
 				77209E771C9CFA870056A4FC /* LaunchScreen.storyboard */,
@@ -218,9 +218,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				77209E711C9CFA870056A4FC /* SecondViewController.swift in Sources */,
+				77209E711C9CFA870056A4FC /* ParkingViewController.swift in Sources */,
 				77209E6D1C9CFA870056A4FC /* AppDelegate.swift in Sources */,
-				77209E6F1C9CFA870056A4FC /* FirstViewController.swift in Sources */,
+				77209E6F1C9CFA870056A4FC /* BuildingViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
