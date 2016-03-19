@@ -19,17 +19,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         // Retrieve API key from keys.plist
-        var myDict: NSDictionary?
+        var keyList: NSDictionary?
         
-        if let path = NSBundle.mainBundle().pathForResource("Config", ofType: "plist") {
-            myDict = NSDictionary(contentsOfFile: path)
+        if let path = NSBundle.mainBundle().pathForResource("keys", ofType: "plist") {
+            keyList = NSDictionary(contentsOfFile: path)
         }
-        
-        if let dict = myDict {
-            let GoogleAPI = keys?["GoogleAPI"] as? String
+        if let _ = keyList {
+            let GoogleAPI = keyList?["GoogleAPI"] as? String
             
             //Google Maps SDK API key
-            GMSServices.provideAPIKey(GoogleAPI)
+            GMSServices.provideAPIKey(GoogleAPI!)
         }
         
         return true
