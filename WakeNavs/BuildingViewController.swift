@@ -25,7 +25,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate {
     var collins = CLLocationCoordinate2D(latitude: 36.131648, longitude: -80.275542)
     var manchester = CLLocationCoordinate2D(latitude: 36.133349, longitude: -80.276640)
     
-    var APIKey: String = ""
+    var ServerAPIKey: String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,10 +51,10 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func callDirectionsAPI() {
-        let apiURL = "https://maps.googleapis.com/maps/api/directions/json?origin=\(collins.latitude),\(collins.longitude)&destination=\(manchester.latitude),\(manchester.longitude)&key=\(APIKey)"
+        let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(collins.latitude),\(collins.longitude)&destination=\(manchester.latitude),\(manchester.longitude)&mode=walking&key=\(ServerAPIKey)"
         
         //Make HTTP request
-        let requestURL: NSURL = NSURL(string: apiURL)!
+        let requestURL: NSURL = NSURL(string: endpoint)!
         let urlRequest: NSMutableURLRequest = NSMutableURLRequest(URL: requestURL)
         let session = NSURLSession.sharedSession()
         let task = session.dataTaskWithRequest(urlRequest) {
@@ -65,8 +65,33 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate {
             
             if (statusCode == 200) {
                 print("Retrieved JSON")
+                
+                do { //Catch error below
+                    
+                    let JSON = try NSJSONSerialization.JSONObjectWithData(data!, options:.AllowFragments)
+                    
+                    /*
+                        Returned JSON contains directions (NE, west..), distance, AND time for each step!
+                    
+                        Use this to see sample response:
+                        https://maps.googleapis.com/maps/api/directions/json?origin=36.131648,-80.275542&destination=36.133349,-80.276640&mode=walking&key="REPLACE SERVER KEY HERE"
+                    */
+                    
+                    if let unwrappedStatus = JSON["status"] as? String {
+                        //If response is successful from Google
+                        if unwrappedStatus == "OK" {
+                            
+                        } else {
+                            print("Error in response: ", unwrappedStatus)
+                        }
+                        
+                    }
+                    
+                } catch {
+                    print("Error with JSON: \(error)")
+                }
             } else {
-                print("HTTP request error: ", statusCode)
+                print("Error retrieving JSON, status: ", statusCode)
             }
         }
     
@@ -82,9 +107,9 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate {
             keyList = NSDictionary(contentsOfFile: path)
         }
         if let _ = keyList {
-            let GoogleAPI = keyList?["GoogleAPI"] as? String
+            let GoogleAPI = keyList?["ServerKey"] as? String
             
-            APIKey = GoogleAPI!
+            ServerAPIKey = GoogleAPI!
         }
 
     }
