@@ -80,6 +80,30 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate {
                     if let unwrappedStatus = JSON["status"] as? String {
                         //If response is successful from Google
                         if unwrappedStatus == "OK" {
+                            print("Status: ", unwrappedStatus)
+                            
+                            if let steps = JSON["routes"]!![0]["legs"]!![0]["steps"] as? [[String: AnyObject]] {
+                                
+                                for step in steps { //For every "vertex"
+                                    
+                                    /*
+                                        Start from here
+                                            For each step:
+                                                1. Store coordinates to array to draw polylines later
+                                                2. Probably store distance/duration as well to display to user for directions
+                                                3. Probably also store html_instructions to show user directions, ie "Head northwest towards Gulley Dr"
+                                        Notes:
+                                            1. Can probably simplify HTTP request, later
+                                            2. No idea what "\u003" and the weird symbols in response mean. Maybe accidentally encoded the response somewhere?
+                                    */
+                                    if let dist = step["distance"]!["value"] as? Int {
+                                        print("Dist: ", dist)
+                                    }
+                                }
+                            }
+                            
+                            
+                            
                             
                         } else {
                             print("Error in response: ", unwrappedStatus)
