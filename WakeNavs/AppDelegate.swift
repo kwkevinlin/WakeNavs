@@ -27,7 +27,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let _ = keyList {
             let GoogleAPI = keyList?["GoogleAPI"] as? String
             
-            //Google Maps SDK API key
+            /* Google Dev Account (enabled):
+                  Google Maps SDK (iOS)
+                  Google Directions API     
+            */
             GMSServices.provideAPIKey(GoogleAPI!)
         }
         
