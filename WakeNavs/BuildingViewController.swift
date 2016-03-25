@@ -11,9 +11,10 @@ import GoogleMaps
 import CoreLocation
 
 
-class BuildingViewController: UIViewController, CLLocationManagerDelegate {
+class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {
 
     @IBOutlet weak var mapView: GMSMapView!
+    @IBOutlet weak var instructionsLabel: UILabel!
     
     var locationManager = CLLocationManager()
     
@@ -27,6 +28,12 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate {
     
     var ServerAPIKey: String = ""
     
+    var path = GMSMutablePath() //Array of CLLocationCoordinate2D
+    var polyline = GMSPolyline()
+    var markerArr = [GMSMarker]()
+    
+    var addPolyline = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -39,9 +46,57 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate {
         
         mapView.myLocationEnabled = true
         
+        polyline.strokeColor = UIColor.blueColor()
+        polyline.strokeWidth = 4.0
+        polyline.map = mapView
+        
         callDirectionsAPI() //Test
+        while (true) {
+            //HAS to be a better solution...
+            if (addPolyline == 1) {
+                print("Path: ", path.count())
+                print("Updating polyline")
+                polyline.path = path //Update polyline to display fetched coordinates
+                addPolyline = 0
+                break
+            }
+            /*
+                Because: All calls to the Google Maps SDK for iOS must be made from the UI thread
+                    So this NEEDS to be running on main thread
+            */
+        }
+        updateDestMarker(manchester)
+        
+        view.bringSubviewToFront(self.instructionsLabel)
     
     }
+    
+    /*
+     
+     Start from here
+        For each step:
+            1. Store coordinates to array to draw polylines later
+            2. Probably store distance/duration as well to display to user for directions
+            3. Probably also store html_instructions to show user directions, ie "Head northwest towards Gulley Dr"
+     
+        Notes:
+            1. Can probably simplify HTTP request, later
+            2. No idea what "\u003" and the weird symbols in response mean.
+            3. When RESETTING/GETTING NEW DESTINATION, erase marker and path
+     
+        Done:
+            Adding polyline
+                But: need to add function to adjust screen
+     
+        Issues:
+            1. Polyline won't erase as user moves (polyline is in segments). Solutions? Render polyline differently?
+     
+        Priority:
+            1. Time steps. If GPS location near endpoint, increment to next step
+                A. Depedency: Instructions, polyline
+     
+     */
+    
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[locations.count - 1]
@@ -84,26 +139,31 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate {
                             
                             if let steps = JSON["routes"]!![0]["legs"]!![0]["steps"] as? [[String: AnyObject]] {
                                 
-                                for step in steps { //For every "vertex"
+                                //Add first polyline, aka origin
+                                self.path.addCoordinate(self.collins)
+                                
+                                //For every waypoint in the route
+                                for step in steps {
                                     
-                                    /*
-                                        Start from here
-                                            For each step:
-                                                1. Store coordinates to array to draw polylines later
-                                                2. Probably store distance/duration as well to display to user for directions
-                                                3. Probably also store html_instructions to show user directions, ie "Head northwest towards Gulley Dr"
-                                        Notes:
-                                            1. Can probably simplify HTTP request, later
-                                            2. No idea what "\u003" and the weird symbols in response mean. Maybe accidentally encoded the response somewhere?
-                                    */
-                                    if let dist = step["distance"]!["value"] as? Int {
-                                        print("Dist: ", dist)
+                                    //Add coordinates path, instead of using encoded polyline
+                                    if let coorLat = step["end_location"]!["lat"] as? Double {                                        if let coorLong = step["end_location"]!["lng"] as? Double {
+                                            //Add coordinates to polyline
+                                            self.path.addLatitude(coorLat, longitude: coorLong)
+                                        
+                                        }
                                     }
-                                }
+                                    
+                                    if let instructions = step["html_instructions"] as? String {
+                                        print (instructions)
+                                        self.updateInstructionsLabel(instructions)
+                                        
+                                    }
+                                    
+                                } //End step loop
                             }
                             
-                            
-                            
+                            //Done adding CLLocation to path, time to update polyline
+                            self.addPolyline = 1
                             
                         } else {
                             print("Error in response: ", unwrappedStatus)
@@ -136,6 +196,20 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate {
             ServerAPIKey = GoogleAPI!
         }
 
+    }
+    
+    func updateInstructionsLabel(instruction: String) {
+        /*
+            This should be parsed to HTML to display
+        */
+        instructionsLabel.text = instruction
+    }
+    
+    func updateDestMarker(origin: CLLocationCoordinate2D) {
+        let marker = GMSMarker(position: origin)
+        marker.title = "Destination"
+        marker.opacity = 0.8
+        marker.map = mapView
     }
 
     override func didReceiveMemoryWarning() {
