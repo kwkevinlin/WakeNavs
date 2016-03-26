@@ -10,6 +10,19 @@ import UIKit
 import GoogleMaps
 import CoreLocation
 
+class Steps {
+    var duration: Int = 0
+    var distance: Int = 0
+    var coordinates: CLLocationCoordinate2D
+    var instructions: String = ""
+    
+    init(dur: Int, dist: Int, coor: CLLocationCoordinate2D, inst: String) {
+        self.duration = dur
+        self.distance = dist
+        self.coordinates = coor
+        self.instructions = inst
+    }
+}
 
 class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {
 
@@ -31,6 +44,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     var path = GMSMutablePath() //Array of CLLocationCoordinate2D
     var polyline = GMSPolyline()
     var markerArr = [GMSMarker]()
+    var stepsArr = [Steps]() //Each step
     
     var addPolyline = 0
     
@@ -58,6 +72,12 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                 print("Updating polyline")
                 polyline.path = path //Update polyline to display fetched coordinates
                 addPolyline = 0
+                
+                //Test output stepsArr
+                for kv in stepsArr {
+                    print(kv.instructions)
+                }
+                
                 break
             }
             /*
@@ -68,7 +88,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         updateDestMarker(manchester)
         
         view.bringSubviewToFront(self.instructionsLabel)
-    
+        
     }
     
     /*
@@ -81,19 +101,17 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
      
         Notes:
             1. Can probably simplify HTTP request, later
-            2. No idea what "\u003" and the weird symbols in response mean.
-            3. When RESETTING/GETTING NEW DESTINATION, erase marker and path
+            2. When RESETTING/GETTING NEW DESTINATION, erase marker and path
      
         Done:
             Adding polyline
                 But: need to add function to adjust screen
      
         Issues:
-            1. Polyline won't erase as user moves (polyline is in segments). Solutions? Render polyline differently?
+            1. Polyline won't erase as user moves (polyline is in segments). Solutions? Last polyline = dist to endpoint
      
         Priority:
-            1. Time steps. If GPS location near endpoint, increment to next step
-                A. Depedency: Instructions, polyline
+            1. Now work on GPS detection if close
      
      */
     
@@ -132,6 +150,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                         https://maps.googleapis.com/maps/api/directions/json?origin=36.131648,-80.275542&destination=36.133349,-80.276640&mode=walking&key="REPLACE SERVER KEY HERE"
                     */
                     
+                    //Parse JSON
                     if let unwrappedStatus = JSON["status"] as? String {
                         //If response is successful from Google
                         if unwrappedStatus == "OK" {
@@ -139,24 +158,30 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                             
                             if let steps = JSON["routes"]!![0]["legs"]!![0]["steps"] as? [[String: AnyObject]] {
                                 
-                                //Add first polyline, aka origin
+                                //Adding ORIGIN as first step
                                 self.path.addCoordinate(self.collins)
+                                self.stepsArr.append(Steps(dur: 0, dist: 0, coor: self.collins, inst: "test"))
                                 
                                 //For every waypoint in the route
                                 for step in steps {
                                     
                                     //Add coordinates path, instead of using encoded polyline
                                     if let coorLat = step["end_location"]!["lat"] as? Double {                                        if let coorLong = step["end_location"]!["lng"] as? Double {
-                                            //Add coordinates to polyline
-                                            self.path.addLatitude(coorLat, longitude: coorLong)
                                         
+                                        
+                                            if let dist = step["distance"]!["value"] as? Int {
+                                                if let dur = step["duration"]!["value"] as? Int {
+                                                    if let instructions = step["html_instructions"] as? String {
+                                                    
+                                                        //Add coordinates to polyline
+                                                        self.path.addLatitude(coorLat, longitude: coorLong)                                                        
+                                                        //Storing to stepsArr
+                                                        self.stepsArr.append(Steps(dur: dur, dist: dist, coor: CLLocationCoordinate2DMake(coorLat, coorLong) , inst: instructions))
+                                                        
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }
-                                    
-                                    if let instructions = step["html_instructions"] as? String {
-                                        print (instructions)
-                                        self.updateInstructionsLabel(instructions)
-                                        
                                     }
                                     
                                 } //End step loop
