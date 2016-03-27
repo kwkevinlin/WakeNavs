@@ -35,6 +35,17 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         Test coordinates:
             Origin: 36.131648, -80.275542 (Collins)
             Dest:   36.133349, -80.276640 (Manchester)
+    
+            Between Origin and [1]
+                36.132319, -80.275763
+            RIGHT beside [1]
+                36.132566, -80.275993
+            Between [1] and [2]
+                36.132798, -80.276214
+            Slightly offpath to the left
+                36.132683, -80.276498
+            RIGHT beside [2]
+                36.133338, -80.276634
     */
     var collins = CLLocationCoordinate2D(latitude: 36.131648, longitude: -80.275542)
     var manchester = CLLocationCoordinate2D(latitude: 36.133349, longitude: -80.276640)
@@ -48,6 +59,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     
     var addPolyline = 0
     var stepsIndex = 1
+    var pathIndex = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,8 +93,8 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                 addPolyline = 0
                 
                 //Test output stepsArr
-                for kv in stepsArr {
-                    print(kv.instructions)
+                for eachStep in stepsArr {
+                    print(eachStep.instructions)
                 }
                 
                 break
@@ -98,24 +110,14 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     /*
      
      Start from here
-        For each step:
-            1. Store coordinates to array to draw polylines later
-            2. Probably store distance/duration as well to display to user for directions
-            3. Probably also store html_instructions to show user directions, ie "Head northwest towards Gulley Dr"
-     
-        Notes:
+        Notes
             1. Can probably simplify HTTP request, later
-            2. When RESETTING/GETTING NEW DESTINATION, erase marker and path
      
-        Done:
-            Adding polyline
-                But: need to add function to adjust screen
+        Fixes:
+            Adjust screen when polyline changes
      
         Issues:
-            1. Polyline won't erase as user moves (polyline is in segments). Solutions? Last polyline = dist to endpoint
-     
-        Priority:
-            1. Now work on GPS detection if close
+            1. Replaced polylines only go in straight lines. Problem if slightly off-path or road is curved. Have to check JSON to see if Google's directions are also in straight lines only
      
      */
     
@@ -129,21 +131,27 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         /*
             For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment stepsIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
         */
-
-        //Get distance
+        
+        //Replace polyline to start display from where you are
+        path.replaceCoordinateAtIndex(UInt(0), withCoordinate: CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude))
+        polyline.path = path
+        
+        //Get distance from current to next waypoint
         let waypoint = CLLocation(latitude: stepsArr[stepsIndex].coordinates.latitude, longitude: stepsArr[stepsIndex].coordinates.longitude) //distanceFromLocation only takes CLLocation
         let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
+        print(locToWaypoint)
         
         //If closer than 6 meters, change polyline to next endpoint
-        if (locToWaypoint < 6) {
-            stepsIndex++
+        if (locToWaypoint < 16) { //Change this back to 6 when deploying
             //If not on last step
-            if (stepsIndex < stepsArr.count) {
+            if (stepsIndex < stepsArr.count - 1) {
+                stepsIndex++
+                //Remove last path
+                path.removeCoordinateAtIndex(UInt(0))
                 
                 
+            } else { //Already on last step
                 
-            } else {
-                //Already on last step
             }
             
             
@@ -187,6 +195,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                             if let steps = JSON["routes"]!![0]["legs"]!![0]["steps"] as? [[String: AnyObject]] {
                                 
                                 //Adding ORIGIN as first step
+                                //Pretty much just a placeholder since it will be replaced very shortly by current GPS location
                                 self.path.addCoordinate(self.collins)
                                 self.stepsArr.append(Steps(dur: 0, dist: 0, coor: self.collins, inst: "test"))
                                 
