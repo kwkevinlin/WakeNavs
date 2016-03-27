@@ -14,12 +14,14 @@ class Steps {
     var duration: Int = 0
     var distance: Int = 0
     var coordinates: CLLocationCoordinate2D
+    var encodedPoly: String
     var instructions: String = ""
     
-    init(dur: Int, dist: Int, coor: CLLocationCoordinate2D, inst: String) {
+    init(dur: Int, dist: Int, coor: CLLocationCoordinate2D, poly: String, inst: String) {
         self.duration = dur
         self.distance = dist
         self.coordinates = coor
+        self.encodedPoly = poly
         self.instructions = inst
     }
 }
@@ -80,17 +82,33 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         /*
             MAJOR ISSUE:
                 Should use encoded poyline instead of coordinates or else polyline won't snap to route
+            Solution:
+                Read all encoded polylines. Then parse them all coordinates into an array or something
+        
+            Now:
+                Polylines are read into stepsArr too. Now, for (i .. stepsArr), add polylines to path
         */
-        //polyline.path = GMSPath.init(fromEncodedPath: "{}o{Edy}hNe@b@QN[As@ESR[Z")
+        //polyline.path = GMSMutablePath.init(fromEncodedPath: "{}o{Edy}hNe@b@QN[As@ESR[Z") //Changed to mutable, check if still work
+        var testPath = GMSMutablePath.init(fromEncodedPath: "{}o{Edy}hNe@b@QN[As@ESR[Z")
+        //var testPath = GMSMutablePath.init(fromEncodedPath: "{}o{Edy}hNw@r@oAGcB`BkAfAS@E@")
+        polyline.path = testPath
+        print(testPath?.count())
+        
+        for (var i = 0; i < Int((testPath?.count())!); i++) {
+            print(testPath?.coordinateAtIndex(UInt(i)))
+            let marker = GMSMarker(position: (testPath?.coordinateAtIndex(UInt(i)))!)
+            marker.map = mapView
+        }
+        
         
         //Call Google Directions API for turn-by-turn navigataion
-        callDirectionsAPI()
+        //callDirectionsAPI()
         
         /* To display the polyline
             Issue because to draw polylines on mapView, it must be on the main thread.
             Drawing polylines inside callDirectionsAPI() will terminate because wrong thread.
         */
-        
+        /*
         while (true) {
             //HAS to be a better solution...
             if (addPolyline == 1) {
@@ -107,6 +125,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                 break
             }
         }
+        */
         
         
         //Put marker on destination
@@ -129,7 +148,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
      
      */
     
-
+/*
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[locations.count - 1]
         
@@ -170,6 +189,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         }
         
     }
+*/
     
     func callDirectionsAPI() {
         let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(collins.latitude),\(collins.longitude)&destination=\(manchester.latitude),\(manchester.longitude)&mode=walking&key=\(ServerAPIKey)"
@@ -209,7 +229,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                                 //Adding ORIGIN as first step
                                 //Pretty much just a placeholder since it will be replaced very shortly by current GPS location
                                 self.path.addCoordinate(self.collins)
-                                self.stepsArr.append(Steps(dur: 0, dist: 0, coor: self.collins, inst: "test"))
+                                self.stepsArr.append(Steps(dur: 0, dist: 0, coor: self.collins, poly: "test", inst: "test"))
                                 
                                 //For every waypoint in the route
                                 for step in steps {
@@ -219,12 +239,12 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                                             if let dist = step["distance"]!["value"] as? Int {
                                                 if let dur = step["duration"]!["value"] as? Int {
                                                     if let instructions = step["html_instructions"] as? String {
-                                                        
-                                                        //Storing to stepsArr
-                                                        self.stepsArr.append(Steps(dur: dur, dist: dist, coor: CLLocationCoordinate2DMake(coorLat, coorLong) , inst: instructions))
-                                                        //Add current coordinates to polyline
-                                                        self.path.addLatitude(coorLat, longitude: coorLong)
-                                                        
+                                                        if let encPoly = step["poyline"]!["points"] as? String {
+                                                            //Storing to stepsArr
+                                                            self.stepsArr.append(Steps(dur: dur, dist: dist, coor: CLLocationCoordinate2DMake(coorLat, coorLong), poly: encPoly, inst: instructions))
+                                                            //Add current coordinates to polyline
+                                                            self.path.addLatitude(coorLat, longitude: coorLong)
+                                                        }
                                                     }
                                                 }
                                             }
