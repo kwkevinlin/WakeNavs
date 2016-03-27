@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E33e" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="14F1605" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="49e-Tb-3d3">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
     </dependencies>
     <scenes>
         <!--Building-->
@@ -35,16 +35,25 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Instructions Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" highlighted="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fP3-qG-MvZ">
                                         <rect key="frame" x="239" y="43" width="122" height="18"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LTl-mO-uoE">
+                                        <rect key="frame" x="267" y="11" width="67" height="30"/>
+                                        <state key="normal" title="Lock Map"/>
+                                        <connections>
+                                            <action selector="lockMapButtion:" destination="9pv-A4-QxB" eventType="touchUpInside" id="nLH-ya-jWv"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstItem="pz5-pd-jMJ" firstAttribute="leading" secondItem="wiz-6t-igq" secondAttribute="leading" constant="57" id="AAg-Ly-RUe"/>
                                     <constraint firstItem="pz5-pd-jMJ" firstAttribute="top" secondItem="wiz-6t-igq" secondAttribute="top" constant="15" id="CnM-sm-Koh"/>
                                     <constraint firstItem="fP3-qG-MvZ" firstAttribute="top" secondItem="wiz-6t-igq" secondAttribute="top" constant="43" id="KoE-Qk-QNP"/>
+                                    <constraint firstItem="LTl-mO-uoE" firstAttribute="centerX" secondItem="fP3-qG-MvZ" secondAttribute="centerX" id="Rg1-gM-n3N"/>
                                     <constraint firstItem="7d9-dp-6nV" firstAttribute="baseline" secondItem="pz5-pd-jMJ" secondAttribute="baseline" id="cPr-TF-h8t"/>
+                                    <constraint firstItem="LTl-mO-uoE" firstAttribute="baseline" secondItem="7d9-dp-6nV" secondAttribute="baseline" id="nbX-qF-TMQ"/>
                                     <constraint firstAttribute="trailing" secondItem="7d9-dp-6nV" secondAttribute="trailing" constant="60" id="sa6-QZ-PBN"/>
                                     <constraint firstItem="fP3-qG-MvZ" firstAttribute="centerX" secondItem="wiz-6t-igq" secondAttribute="centerX" id="zwJ-QW-Kdd"/>
                                 </constraints>
@@ -69,6 +78,7 @@
                     <tabBarItem key="tabBarItem" title="Building" image="first" id="acW-dT-cKf"/>
                     <connections>
                         <outlet property="instructionsLabel" destination="fP3-qG-MvZ" id="uSs-Vp-GJI"/>
+                        <outlet property="lockMap" destination="LTl-mO-uoE" id="gX9-4M-5tU"/>
                         <outlet property="mapView" destination="8ZW-v4-yjg" id="EcG-au-du0"/>
                     </connections>
                 </viewController>

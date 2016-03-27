@@ -30,6 +30,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
 
     @IBOutlet weak var mapView: GMSMapView!
     @IBOutlet weak var instructionsLabel: UILabel!
+    @IBOutlet weak var lockMap: UIButton!
     
     var locationManager = CLLocationManager()
     
@@ -62,6 +63,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     var addPolyline = 0
     var stepsIndex = 1
     var pathIndex = 0
+    var mapLock = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,7 +75,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         
-        //mapView.myLocationEnabled = true
+        mapView.myLocationEnabled = true
         
         polyline.strokeColor = UIColor.blueColor()
         polyline.strokeWidth = 5.0
@@ -119,6 +121,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         //Adding markers to ALL coordinates for test
         for (var i = 0; i < Int(path.count()); i++) {
             let marker = GMSMarker(position: path.coordinateAtIndex(UInt(i)))
+            marker.title = String(i)
             marker.map = mapView
         }
         
@@ -132,6 +135,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         //Put marker on destination
         updateDestMarker(manchester)
         view.bringSubviewToFront(self.instructionsLabel)
+        view.bringSubviewToFront(self.lockMap)
         
     }
     
@@ -145,16 +149,15 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             Adjust screen when polyline changes
      
         Issues:
-            1. Polyline does NOT snap to road. Working on that now
+            1. Polyline not deleting in step 2
      
      */
     
-/*
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[locations.count - 1]
         
-        let camera: GMSCameraPosition = GMSCameraPosition.cameraWithTarget(location.coordinate, zoom: 16.5)
-        mapView.camera = camera
+        //Update camera for map
+        updateMap(location)
         
         /*
             For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment stepsIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
@@ -164,19 +167,15 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         path.replaceCoordinateAtIndex(UInt(0), withCoordinate: CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude))
         polyline.path = path
         
-        //Update mapView based on new path
-        let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 150.0)
-        mapView.moveCamera(pathBound)
-        
-        //Get distance from current to next waypoint
-        let waypoint = CLLocation(latitude: stepsArr[stepsIndex].coordinates.latitude, longitude: stepsArr[stepsIndex].coordinates.longitude) //distanceFromLocation only takes CLLocation
+        //Get distance from current to next waypoint in path
+        let waypoint = CLLocation(latitude: path.coordinateAtIndex(UInt(stepsIndex)).latitude, longitude: path.coordinateAtIndex(UInt(stepsIndex)).longitude) //distanceFromLocation only takes CLLocation
         let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
-        print(locToWaypoint)
+        print(locToWaypoint, ", step: ", stepsIndex, ", mapLock: ", mapLock)
         
         //If closer than 6 meters, change polyline to next endpoint
         if (locToWaypoint < 16) { //Change this back to 6 when deploying
             //If not on last step
-            if (stepsIndex < stepsArr.count - 1) {
+            if (stepsIndex < Int(path.count()) - 1) {
                 stepsIndex++
                 //Remove last path
                 path.removeCoordinateAtIndex(UInt(0))
@@ -190,7 +189,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         }
         
     }
-*/
+    
     
     func callDirectionsAPI() {
         let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(collins.latitude),\(collins.longitude)&destination=\(manchester.latitude),\(manchester.longitude)&mode=walking&key=\(ServerAPIKey)"
@@ -300,6 +299,32 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         marker.map = mapView
     }
 
+    
+    @IBAction func lockMapButtion(sender: AnyObject) {
+        print("Lock map pressed")
+        if (mapLock == 1) {
+            mapLock = 0
+            lockMap.highlighted = false
+        } else {
+            mapLock = 1
+            lockMap.highlighted = true
+        }
+    }
+    
+    func updateMap(coord: CLLocation) {
+        //If locked
+        if (mapLock == 1) {
+            //Update camera view
+            let camera: GMSCameraPosition = GMSCameraPosition.cameraWithTarget(coord.coordinate, zoom: 16.5)
+            mapView.camera = camera
+            
+            //Update mapView based on new path
+            let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 150.0)
+            mapView.moveCamera(pathBound)
+        }
+        //Else, don't update mapView
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
