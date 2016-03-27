@@ -39,16 +39,14 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             Origin: 36.131648, -80.275542 (Collins)
             Dest:   36.133349, -80.276640 (Manchester)
     
-            Between Origin and [1]
-                36.132319, -80.275763
-            RIGHT beside [1]
-                36.132566, -80.275993
-            Between [1] and [2]
-                36.132798, -80.276214
-            Slightly offpath to the left
-                36.132683, -80.276498
-            RIGHT beside [2]
-                36.133338, -80.276634
+            Near [1]
+            36.131834, -80.275709
+            Near [2]
+            36.131931, -80.275800
+            Near [3]
+            36.132050, -80.275792
+            Near [4]
+            36.132314, -80.275765
     */
     var collins = CLLocationCoordinate2D(latitude: 36.131648, longitude: -80.275542)
     var manchester = CLLocationCoordinate2D(latitude: 36.133349, longitude: -80.276640)
@@ -61,7 +59,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     var stepsArr = [Steps]() //Each step
     
     var addPolyline = 0
-    var stepsIndex = 1
+    var stepsIndex = 0 //1
     var pathIndex = 0
     var mapLock = 1
     
@@ -81,27 +79,12 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         polyline.strokeWidth = 5.0
         polyline.map = mapView
         
-        /*
-            MAJOR ISSUE:
-                Should use encoded poyline instead of coordinates or else polyline won't snap to route
-            Solution:
-                Now:
-                    Path has ALL coordinates now. Work on the locationManager now
-        */
-        
-        //var testPath = GMSMutablePath.init(fromEncodedPath: "{}o{Edy}hNe@b@QN[As@ESR[Z")
-        //var testPath = GMSMutablePath.init(fromEncodedPath: "{}o{Edy}hNw@r@oAGcB`BkAfAS@E@")
-        //polyline.path = testPath
-        //print(testPath?.count())
-        
         //Call Google Directions API for turn-by-turn navigataion
         callDirectionsAPI()
         
-        /* To display the polyline
-            Issue because to draw polylines on mapView, it must be on the main thread.
-            Drawing polylines inside callDirectionsAPI() will terminate because wrong thread.
+        /* 
+            Can move this to inside callDirectionsAPI
         */
-        
         while (true) {
             //HAS to be a better solution...
             if (addPolyline == 1) {
@@ -149,14 +132,14 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             Adjust screen when polyline changes
      
         Issues:
-            1. Polyline not deleting in step 2
+            1. Something is wrong with deleting polyline coordinate points. Always SKIPS one, like deleting only even coordinates (delete 0, skip 1, delete 2...)
      
      */
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[locations.count - 1]
         
-        //Update camera for map
+        //Update map with current location
         updateMap(location)
         
         /*
@@ -170,14 +153,17 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         //Get distance from current to next waypoint in path
         let waypoint = CLLocation(latitude: path.coordinateAtIndex(UInt(stepsIndex)).latitude, longitude: path.coordinateAtIndex(UInt(stepsIndex)).longitude) //distanceFromLocation only takes CLLocation
         let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
-        print(locToWaypoint, ", step: ", stepsIndex, ", mapLock: ", mapLock)
+        print(locToWaypoint, ", step: ", stepsIndex)
+        //print("Comparing to: ", path.coordinateAtIndex(UInt(stepsIndex)))
         
-        //If closer than 6 meters, change polyline to next endpoint
-        if (locToWaypoint < 16) { //Change this back to 6 when deploying
+        //If closer than 6 meters, change polyline to next waypoint
+        if (locToWaypoint < 6) {
+            print("TESSSSSSSST")
             //If not on last step
             if (stepsIndex < Int(path.count()) - 1) {
                 stepsIndex++
                 //Remove last path
+                print("Removing: ", path.coordinateAtIndex(UInt(0)))
                 path.removeCoordinateAtIndex(UInt(0))
                 
                 
@@ -301,11 +287,12 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
 
     
     @IBAction func lockMapButtion(sender: AnyObject) {
-        print("Lock map pressed")
         if (mapLock == 1) {
+            print("Unlocking map")
             mapLock = 0
             lockMap.highlighted = false
         } else {
+            print("Locking map")
             mapLock = 1
             lockMap.highlighted = true
         }
