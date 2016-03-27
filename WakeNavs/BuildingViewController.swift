@@ -47,6 +47,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     var stepsArr = [Steps]() //Each step
     
     var addPolyline = 0
+    var stepsIndex = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,10 +62,16 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         mapView.myLocationEnabled = true
         
         polyline.strokeColor = UIColor.blueColor()
-        polyline.strokeWidth = 4.0
+        polyline.strokeWidth = 5.0
         polyline.map = mapView
         
-        callDirectionsAPI() //Test
+        //Call Google Directions API for turn-by-turn navigataion
+        callDirectionsAPI()
+        
+        /* To display the polyline
+            Issue because to draw polylines on mapView, it must be on the main thread.
+            Drawing polylines inside callDirectionsAPI() will terminate because wrong thread.
+        */
         while (true) {
             //HAS to be a better solution...
             if (addPolyline == 1) {
@@ -80,13 +87,10 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                 
                 break
             }
-            /*
-                Because: All calls to the Google Maps SDK for iOS must be made from the UI thread
-                    So this NEEDS to be running on main thread
-            */
         }
-        updateDestMarker(manchester)
         
+        //Put marker on destination
+        updateDestMarker(manchester)
         view.bringSubviewToFront(self.instructionsLabel)
         
     }
@@ -121,6 +125,30 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         
         let camera: GMSCameraPosition = GMSCameraPosition.cameraWithTarget(location.coordinate, zoom: 16.5)
         mapView.camera = camera
+        
+        /*
+            For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment stepsIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
+        */
+
+        //Get distance
+        let waypoint = CLLocation(latitude: stepsArr[stepsIndex].coordinates.latitude, longitude: stepsArr[stepsIndex].coordinates.longitude) //distanceFromLocation only takes CLLocation
+        let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
+        
+        //If closer than 6 meters, change polyline to next endpoint
+        if (locToWaypoint < 6) {
+            stepsIndex++
+            //If not on last step
+            if (stepsIndex < stepsArr.count) {
+                
+                
+                
+            } else {
+                //Already on last step
+            }
+            
+            
+        }
+        
     }
     
     func callDirectionsAPI() {
@@ -167,16 +195,14 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                                     
                                     //Add coordinates path, instead of using encoded polyline
                                     if let coorLat = step["end_location"]!["lat"] as? Double {                                        if let coorLong = step["end_location"]!["lng"] as? Double {
-                                        
-                                        
                                             if let dist = step["distance"]!["value"] as? Int {
                                                 if let dur = step["duration"]!["value"] as? Int {
                                                     if let instructions = step["html_instructions"] as? String {
-                                                    
-                                                        //Add coordinates to polyline
-                                                        self.path.addLatitude(coorLat, longitude: coorLong)                                                        
+                                                        
                                                         //Storing to stepsArr
                                                         self.stepsArr.append(Steps(dur: dur, dist: dist, coor: CLLocationCoordinate2DMake(coorLat, coorLong) , inst: instructions))
+                                                        //Add current coordinates to polyline
+                                                        self.path.addLatitude(coorLat, longitude: coorLong)
                                                         
                                                     }
                                                 }
