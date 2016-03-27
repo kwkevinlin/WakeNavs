@@ -71,11 +71,17 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         
-        mapView.myLocationEnabled = true
+        //mapView.myLocationEnabled = true
         
         polyline.strokeColor = UIColor.blueColor()
         polyline.strokeWidth = 5.0
         polyline.map = mapView
+        
+        /*
+            MAJOR ISSUE:
+                Should use encoded poyline instead of coordinates or else polyline won't snap to route
+        */
+        //polyline.path = GMSPath.init(fromEncodedPath: "{}o{Edy}hNe@b@QN[As@ESR[Z")
         
         //Call Google Directions API for turn-by-turn navigataion
         callDirectionsAPI()
@@ -84,6 +90,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             Issue because to draw polylines on mapView, it must be on the main thread.
             Drawing polylines inside callDirectionsAPI() will terminate because wrong thread.
         */
+        
         while (true) {
             //HAS to be a better solution...
             if (addPolyline == 1) {
@@ -101,6 +108,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             }
         }
         
+        
         //Put marker on destination
         updateDestMarker(manchester)
         view.bringSubviewToFront(self.instructionsLabel)
@@ -117,11 +125,11 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             Adjust screen when polyline changes
      
         Issues:
-            1. Replaced polylines only go in straight lines. Problem if slightly off-path or road is curved. Have to check JSON to see if Google's directions are also in straight lines only
+            1. Polyline does NOT snap to road. Directions API response is not accurate enough.
      
      */
     
-    
+
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations[locations.count - 1]
         
@@ -135,6 +143,10 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         //Replace polyline to start display from where you are
         path.replaceCoordinateAtIndex(UInt(0), withCoordinate: CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude))
         polyline.path = path
+        
+        //Update mapView based on new path
+        let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 150.0)
+        mapView.moveCamera(pathBound)
         
         //Get distance from current to next waypoint
         let waypoint = CLLocation(latitude: stepsArr[stepsIndex].coordinates.latitude, longitude: stepsArr[stepsIndex].coordinates.longitude) //distanceFromLocation only takes CLLocation
