@@ -59,8 +59,8 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     var stepsArr = [Steps]() //Each step
     
     var addPolyline = 0
-    var stepsIndex = 0 //1
-    var pathIndex = 0
+    var pathIndex = 0 //1
+    var stepIndex = 1
     var mapLock = 1
     
     override func viewDidLoad() {
@@ -143,7 +143,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         updateMap(location)
         
         /*
-            For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment stepsIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
+            For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment pathIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
         */
         
         //Replace polyline to start display from where you are
@@ -151,20 +151,23 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         polyline.path = path
         
         //Get distance from current to next waypoint in path
-        let waypoint = CLLocation(latitude: path.coordinateAtIndex(UInt(stepsIndex)).latitude, longitude: path.coordinateAtIndex(UInt(stepsIndex)).longitude) //distanceFromLocation only takes CLLocation
+        //if (path.coordinateAtIndex(UInt(pathIndex))
+        //pathIndex
+        let waypoint = CLLocation(latitude: path.coordinateAtIndex(UInt(1)).latitude, longitude: path.coordinateAtIndex(UInt(1)).longitude) //distanceFromLocation only takes CLLocation
         let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
-        print(locToWaypoint, ", step: ", stepsIndex)
-        //print("Comparing to: ", path.coordinateAtIndex(UInt(stepsIndex)))
+        print(locToWaypoint, ", step: ", pathIndex)
+        //print("Comparing to: ", path.coordinateAtIndex(UInt(pathIndex)))
         
         //If closer than 6 meters, change polyline to next waypoint
         if (locToWaypoint < 6) {
-            print("TESSSSSSSST")
             //If not on last step
-            if (stepsIndex < Int(path.count()) - 1) {
-                stepsIndex++
+            if (pathIndex < Int(path.count()) - 1) {
                 //Remove last path
                 print("Removing: ", path.coordinateAtIndex(UInt(0)))
                 path.removeCoordinateAtIndex(UInt(0))
+                pathIndex++
+                
+                
                 
                 
             } else { //Already on last step
