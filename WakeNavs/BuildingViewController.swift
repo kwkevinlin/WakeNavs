@@ -83,50 +83,51 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             MAJOR ISSUE:
                 Should use encoded poyline instead of coordinates or else polyline won't snap to route
             Solution:
-                Read all encoded polylines. Then parse them all coordinates into an array or something
-        
-            Now:
-                Polylines are read into stepsArr too. Now, for (i .. stepsArr), add polylines to path
+                Now:
+                    Path has ALL coordinates now. Work on the locationManager now
         */
-        //polyline.path = GMSMutablePath.init(fromEncodedPath: "{}o{Edy}hNe@b@QN[As@ESR[Z") //Changed to mutable, check if still work
-        var testPath = GMSMutablePath.init(fromEncodedPath: "{}o{Edy}hNe@b@QN[As@ESR[Z")
+        
+        //var testPath = GMSMutablePath.init(fromEncodedPath: "{}o{Edy}hNe@b@QN[As@ESR[Z")
         //var testPath = GMSMutablePath.init(fromEncodedPath: "{}o{Edy}hNw@r@oAGcB`BkAfAS@E@")
-        polyline.path = testPath
-        print(testPath?.count())
-        
-        for (var i = 0; i < Int((testPath?.count())!); i++) {
-            print(testPath?.coordinateAtIndex(UInt(i)))
-            let marker = GMSMarker(position: (testPath?.coordinateAtIndex(UInt(i)))!)
-            marker.map = mapView
-        }
-        
+        //polyline.path = testPath
+        //print(testPath?.count())
         
         //Call Google Directions API for turn-by-turn navigataion
-        //callDirectionsAPI()
+        callDirectionsAPI()
         
         /* To display the polyline
             Issue because to draw polylines on mapView, it must be on the main thread.
             Drawing polylines inside callDirectionsAPI() will terminate because wrong thread.
         */
-        /*
+        
         while (true) {
             //HAS to be a better solution...
             if (addPolyline == 1) {
-                print("Path: ", path.count())
-                print("Updating polyline")
-                polyline.path = path //Update polyline to display fetched coordinates
-                addPolyline = 0
                 
-                //Test output stepsArr
-                for eachStep in stepsArr {
-                    print(eachStep.instructions)
+                //Add every coordinate in encoded polyline to path
+                for (var i = 0; i < stepsArr.count; i++) {
+                    let testPath = GMSMutablePath.init(fromEncodedPath: stepsArr[i].encodedPoly)
+                    for (var j = 0; j < Int(testPath!.count()); j++) {
+                        path.addCoordinate((testPath?.coordinateAtIndex(UInt(j)))!)
+                    }
                 }
                 
                 break
             }
         }
-        */
         
+        //Adding markers to ALL coordinates for test
+        for (var i = 0; i < Int(path.count()); i++) {
+            let marker = GMSMarker(position: path.coordinateAtIndex(UInt(i)))
+            marker.map = mapView
+        }
+        
+        //Update polyline
+        polyline.path = path
+        
+        //For debug
+        let camera = GMSCameraPosition.cameraWithLatitude(36.131648, longitude: -80.275542, zoom: 16.5)
+        mapView.camera = camera
         
         //Put marker on destination
         updateDestMarker(manchester)
@@ -144,7 +145,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             Adjust screen when polyline changes
      
         Issues:
-            1. Polyline does NOT snap to road. Directions API response is not accurate enough.
+            1. Polyline does NOT snap to road. Working on that now
      
      */
     
@@ -226,11 +227,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                             
                             if let steps = JSON["routes"]!![0]["legs"]!![0]["steps"] as? [[String: AnyObject]] {
                                 
-                                //Adding ORIGIN as first step
-                                //Pretty much just a placeholder since it will be replaced very shortly by current GPS location
-                                self.path.addCoordinate(self.collins)
-                                self.stepsArr.append(Steps(dur: 0, dist: 0, coor: self.collins, poly: "test", inst: "test"))
-                                
                                 //For every waypoint in the route
                                 for step in steps {
                                     
@@ -239,11 +235,11 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                                             if let dist = step["distance"]!["value"] as? Int {
                                                 if let dur = step["duration"]!["value"] as? Int {
                                                     if let instructions = step["html_instructions"] as? String {
-                                                        if let encPoly = step["poyline"]!["points"] as? String {
+                                                        if let encPoly = step["polyline"]!["points"] as? String {
                                                             //Storing to stepsArr
                                                             self.stepsArr.append(Steps(dur: dur, dist: dist, coor: CLLocationCoordinate2DMake(coorLat, coorLong), poly: encPoly, inst: instructions))
                                                             //Add current coordinates to polyline
-                                                            self.path.addLatitude(coorLat, longitude: coorLong)
+                                                            //self.path.addLatitude(coorLat, longitude: coorLong)
                                                         }
                                                     }
                                                 }
