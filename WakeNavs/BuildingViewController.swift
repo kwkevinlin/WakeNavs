@@ -47,6 +47,10 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             36.132050, -80.275792
             Near [4]
             36.132314, -80.275765
+            Near [5]
+            36.132426, -80.275853
+            Near [7] (Major)
+            36.132574, -80.275999
     */
     var collins = CLLocationCoordinate2D(latitude: 36.131648, longitude: -80.275542)
     var manchester = CLLocationCoordinate2D(latitude: 36.133349, longitude: -80.276640)
@@ -59,9 +63,11 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     var stepsArr = [Steps]() //Each step
     
     var addPolyline = 0
-    var pathIndex = 0 //1
-    var stepIndex = 1
+    var pathIndex = 0
+    var stepIndex = 0
     var mapLock = 1
+    
+    var oldDist: CLLocationDistance = 0.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,6 +117,9 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         //Update polyline
         polyline.path = path
         
+        //Update instructions label
+        updateInstructionsLabel(stepsArr[0].instructions)
+        
         //For debug
         let camera = GMSCameraPosition.cameraWithLatitude(36.131648, longitude: -80.275542, zoom: 16.5)
         mapView.camera = camera
@@ -132,7 +141,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             Adjust screen when polyline changes
      
         Issues:
-            1. Something is wrong with deleting polyline coordinate points. Always SKIPS one, like deleting only even coordinates (delete 0, skip 1, delete 2...)
+            1. No marker 6? Since no marker 6, use another method to find major end_coordinate
      
      */
     
@@ -141,6 +150,14 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         
         //Update map with current location
         updateMap(location)
+        
+        // If current waypoint is major coordinate, then update instructions label
+        // Each "step" in returned JSON has one directions string and many coordinates for polyline (because road may be curved, etc). Major coordinate = the last coordinate for that particular step.
+        var updateInstructions = 0
+        if (path.coordinateAtIndex(UInt(1)).latitude == stepsArr[stepIndex].coordinates.latitude && path.coordinateAtIndex(UInt(1)).longitude == stepsArr[stepIndex].coordinates.longitude) {
+            print("Next Coordinate is Major")
+            updateInstructions = 1
+        }
         
         /*
             For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment pathIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
@@ -151,23 +168,27 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         polyline.path = path
         
         //Get distance from current to next waypoint in path
-        //if (path.coordinateAtIndex(UInt(pathIndex))
-        //pathIndex
         let waypoint = CLLocation(latitude: path.coordinateAtIndex(UInt(1)).latitude, longitude: path.coordinateAtIndex(UInt(1)).longitude) //distanceFromLocation only takes CLLocation
         let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
-        print(locToWaypoint, ", step: ", pathIndex)
-        //print("Comparing to: ", path.coordinateAtIndex(UInt(pathIndex)))
+        if (locToWaypoint != oldDist) { //Don't need to print everytime
+            print(locToWaypoint, ", step: ", pathIndex)
+            oldDist = locToWaypoint
+        }
         
         //If closer than 6 meters, change polyline to next waypoint
         if (locToWaypoint < 6) {
             //If not on last step
             if (pathIndex < Int(path.count()) - 1) {
                 //Remove last path
-                print("Removing: ", path.coordinateAtIndex(UInt(0)))
+                //print("Removing: ", path.coordinateAtIndex(UInt(0)))
                 path.removeCoordinateAtIndex(UInt(0))
                 pathIndex++
                 
-                
+                if (updateInstructions == 1) {
+                    print("Updating Instructions")
+                    updateInstructionsLabel(stepsArr[stepIndex].instructions)
+                    stepIndex++
+                }
                 
                 
             } else { //Already on last step
