@@ -101,10 +101,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         polyline.strokeWidth = 5.0
         polyline.map = mapView
         
-        /*
-            Note: viewDidLoad gets run a second time when segue back from search table view
-        */
-        
         //For debug
         let camera = GMSCameraPosition.cameraWithLatitude(36.131648, longitude: -80.275542, zoom: 16.5)
         mapView.camera = camera
@@ -114,9 +110,8 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         
     }
     
-    func setup(dest: String) {
-        print("Found destination: ", dest)
-        print("Coord: ", destination.latitude, ", ", destination.longitude)
+    func setup() {
+        print("Coordinate: ", destination.latitude, ", ", destination.longitude)
         
         //Call Google Directions API for turn-by-turn navigataion
         callDirectionsAPI()
@@ -141,8 +136,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         
         //Update total number of coordinates in path
         pathCount = Int(path.count())
-        print(pathCount)
-        print(stepsArr.count)
         
         //Adding markers to ALL coordinates for test
         for (var i = 0; i < pathCount; i++) {
@@ -155,7 +148,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         polyline.path = path
         
         //Update instructions label
-        //updateInstructionsLabel(stepsArr[0].instructions)
+        updateInstructionsLabel(stepsArr[0].instructions)
         
         //Put marker on destination
         updateDestMarker(manchester)
@@ -236,7 +229,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     
     
     func callDirectionsAPI() {
-        let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(collins.latitude),\(collins.longitude)&destination=\(destination.latitude),\(destination.longitude)&mode=walking&key=\(ServerAPIKey)"
+        let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(origin.latitude),\(origin.longitude)&destination=\(destination.latitude),\(destination.longitude)&mode=walking&key=\(ServerAPIKey)"
         
         //Make HTTP request
         let requestURL: NSURL = NSURL(string: endpoint)!
@@ -374,27 +367,39 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     
     @IBAction func selectDestinationButton(sender: AnyObject) {
         print("Selecting Destination")
-    }
-    
-    @IBAction func backButtonSegue(segue:UIStoryboardSegue) {
-        print("Back Segue")
+        //Automatic segue to SearchView to select destination
     }
     
     @IBAction func sendDestinationSegue(segue:UIStoryboardSegue) {
-        print("Send Data Segue")
         
         if (segue.identifier != nil) {
             if segue.identifier == "segueBackWithData" {
                 
                 let viewController = segue.sourceViewController as! SearchViewController
-                
+            
                 let indexPath = viewController.tableView.indexPathForSelectedRow!
                 let currentCell = viewController.tableView.cellForRowAtIndexPath(indexPath)! as UITableViewCell
                 
-                print(currentCell.textLabel!.text)
+                //This is hardcoded, becareful!
+                if (currentCell.textLabel!.text == "Manchester") {
+                    print("Destination: Manchester")
+                    destination.latitude = 36.133349
+                    destination.longitude = -80.276640
+                } else if (currentCell.textLabel!.text == "Collins") {
+                    print("Destination: Collins")
+                    destination.latitude = 36.131648
+                    destination.longitude = -80.275542
+                }
+                
+                //Call setup, which will call callDirectionsAPI() and etc etc etc
+                setup()
+                
             }
         }
-        
+    }
+    
+    @IBAction func backButtonSegue(segue:UIStoryboardSegue) {
+        print("Back Segue")
     }
     
     override func didReceiveMemoryWarning() {

@@ -48,35 +48,37 @@ class SearchViewController: UITableViewController {
         
         return cell
     }
-    
-    //Start
+
+    //Previous method of passing data
+    /*
     var valueToPass:String!
     
     override func tableView(tableView: UITableView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
-        //print("You selected cell #\(indexPath.row)!")
+        print("You selected cell #\(indexPath.row)!")
         
-        // Get Cell Label
-//        let indexPath = tableView.indexPathForSelectedRow!
-//        let currentCell = tableView.cellForRowAtIndexPath(indexPath)! as UITableViewCell
-//        
-//        valueToPass = currentCell.textLabel!.text
-//        print("Sending back: ", valueToPass)
-//        performSegueWithIdentifier("segueBackWithData", sender: self)
+         Get Cell Label
+        let indexPath = tableView.indexPathForSelectedRow!
+        let currentCell = tableView.cellForRowAtIndexPath(indexPath)! as UITableViewCell
+        
+        valueToPass = currentCell.textLabel!.text
+        print("Sending back: ", valueToPass)
+        performSegueWithIdentifier("segueBackWithData", sender: self)
     }
     
-//    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?){
-//        
-//        if (segue.identifier == "segueBackWithData") {
-//            
-//            //Initialize new view controller and cast it as BuildingViewController
-//            let viewController = segue.destinationViewController as! BuildingViewController
-//            //Setup destination variable in BuildingViewController
-//            viewController.destination.latitude = 36.133349 //This is HARDCODED for now
-//            viewController.destination.longitude = -80.276640
-//            //Call setup function passing in valueToPass (aka selected destination)
-//            viewController.setup(valueToPass)
-//        }
-//    }
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?){
+        
+        if (segue.identifier == "segueBackWithData") {
+            
+            //Initialize new view controller and cast it as BuildingViewController
+            let viewController = segue.destinationViewController as! BuildingViewController
+            //Setup destination variable in BuildingViewController
+            viewController.destination.latitude = 36.133349 //This is HARDCODED for now
+            viewController.destination.longitude = -80.276640
+            //Call setup function passing in valueToPass (aka selected destination)
+            viewController.setup(valueToPass)
+        }
+    }
+    */
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 60.0
