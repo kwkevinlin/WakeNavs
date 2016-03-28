@@ -72,6 +72,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     
     var path = GMSMutablePath() //Array of CLLocationCoordinate2D
     var polyline = GMSPolyline()
+    var markerArr = [GMSMarker]()
     var stepsArr = [Steps]() //Each step
     
     var doneParse = false
@@ -111,7 +112,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     }
     
     func setup() {
-        print("Coordinate: ", destination.latitude, ", ", destination.longitude)
         
         //Call Google Directions API for turn-by-turn navigataion
         callDirectionsAPI()
@@ -139,9 +139,9 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         
         //Adding markers to ALL coordinates for test
         for (var i = 0; i < pathCount; i++) {
-            let marker = GMSMarker(position: path.coordinateAtIndex(UInt(i)))
-            marker.title = String(i)
-            marker.map = mapView
+            markerArr.append(GMSMarker(position: path.coordinateAtIndex(UInt(i))))
+            markerArr[markerArr.count - 1].title = String(i)
+            markerArr[markerArr.count - 1].map = mapView
         }
         
         //Update polyline
@@ -157,10 +157,10 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     /*
         Notes
             1. Can probably simplify HTTP request, later
+            2. Check if polyline and marker clearing is working properly (I think it is not). Also updateDestMarker() is not in markerArr, so that won't be removed.
      
         Issues:
-            1. MARKERS NOT APPEARING AFTER SEGUE ADDED. Segues not configured correctly? Can't update HTML tag as well now.
-                ^ Check this. Is this still hapenning?
+            1. Initiate stepsIndex as 0, because if path is short (aka only one step), then locationManager will go out of index (trying to access stepsArr[1] when there is only one step (at [0]))
     
      */
     
@@ -322,10 +322,33 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     }
     
     func updateInstructionsLabel(instruction: String) {
-        /*
-            This should be parsed to HTML to display
+        /* 
+            Currently displaying HTML tags in label
         */
-        instructionsLabel.text = instruction
+        let encodedData = instruction.dataUsingEncoding(NSUTF8StringEncoding)!
+        var attributedString: NSAttributedString?
+        
+        do {
+            try attributedString = NSAttributedString(data: encodedData, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:NSUTF8StringEncoding], documentAttributes: nil)
+            
+        } catch let error as NSError {
+            print("Error in decoding instructions: ", error.localizedDescription)
+            attributedString = nil
+        }
+        
+        instructionsLabel.text = attributedString!.string
+    }
+    
+    func decodeString(encodedString:String) -> NSAttributedString? {
+        
+        let encodedData = encodedString.dataUsingEncoding(NSUTF8StringEncoding)!
+        
+        do {
+            return try NSAttributedString(data: encodedData, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:NSUTF8StringEncoding], documentAttributes: nil)
+        } catch let error as NSError {
+            print("Error in decoding instructions: ", error.localizedDescription)
+            return nil
+        }
     }
     
     func updateDestMarker(destCoord: CLLocationCoordinate2D) {
@@ -335,7 +358,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         marker.map = mapView
     }
 
-    
     @IBAction func lockMapButtion(sender: AnyObject) {
         if (mapLock == true) {
             print("Unlocking map")
@@ -368,6 +390,14 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     @IBAction func selectDestinationButton(sender: AnyObject) {
         print("Selecting Destination")
         //Automatic segue to SearchView to select destination
+        
+        //Clear all markers and polylines on mapView to prepare for new destination if re-selected
+        path.removeAllCoordinates()
+        
+        for (var i = 0; i < markerArr.count; i++) {
+            markerArr[i].map = nil //Clears markers
+        }
+        markerArr.removeAll() //Do I need both?
     }
     
     @IBAction func sendDestinationSegue(segue:UIStoryboardSegue) {
