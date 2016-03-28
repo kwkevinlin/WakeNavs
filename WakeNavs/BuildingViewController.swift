@@ -166,8 +166,8 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             1. Can probably simplify HTTP request, later
      
         Issues:
-            1. Tab bar disappears after segue back from search table
-            2. MARKERS NOT APPEARING AFTER SEGUE ADDED. Segues not configured correctly? Can't update HTML tag as well now.
+            1. MARKERS NOT APPEARING AFTER SEGUE ADDED. Segues not configured correctly? Can't update HTML tag as well now.
+                ^ Check this. Is this still hapenning?
     
      */
     
@@ -382,6 +382,19 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     
     @IBAction func sendDestinationSegue(segue:UIStoryboardSegue) {
         print("Send Data Segue")
+        
+        if (segue.identifier != nil) {
+            if segue.identifier == "segueBackWithData" {
+                
+                let viewController = segue.sourceViewController as! SearchViewController
+                
+                let indexPath = viewController.tableView.indexPathForSelectedRow!
+                let currentCell = viewController.tableView.cellForRowAtIndexPath(indexPath)! as UITableViewCell
+                
+                print(currentCell.textLabel!.text)
+            }
+        }
+        
     }
     
     override func didReceiveMemoryWarning() {
