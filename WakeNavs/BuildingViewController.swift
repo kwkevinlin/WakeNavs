@@ -69,13 +69,12 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     
     var path = GMSMutablePath() //Array of CLLocationCoordinate2D
     var polyline = GMSPolyline()
-    var markerArr = [GMSMarker]()
     var stepsArr = [Steps]() //Each step
     
-    var addPolyline = 0
+    var doneParse = false
+    var mapLock = true
     var pathIndex = 0
     var stepIndex = 1
-    var mapLock = 1
     
     var oldDist: CLLocationDistance = 0.0
     var pathCount: Int = 0
@@ -103,8 +102,8 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             Can move this to inside callDirectionsAPI
         */
         while (true) {
-            //HAS to be a better solution...
-            if (addPolyline == 1) {
+            //HAS to have a better solution...
+            if (doneParse == true) {
                 
                 //Add every coordinate in encoded polyline to path
                 for (var i = 0; i < stepsArr.count; i++) {
@@ -254,8 +253,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                                                         if let encPoly = step["polyline"]!["points"] as? String {
                                                             //Storing to stepsArr
                                                             self.stepsArr.append(Steps(dur: dur, dist: dist, coor: CLLocationCoordinate2DMake(coorLat, coorLong), poly: encPoly, inst: instructions))
-                                                            //Add current coordinates to polyline
-                                                            //self.path.addLatitude(coorLat, longitude: coorLong)
+                                                            
                                                         }
                                                     }
                                                 }
@@ -267,7 +265,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
                             }
                             
                             //Done adding CLLocation to path, time to update polyline
-                            self.addPolyline = 1
+                            self.doneParse = true
                             
                         } else {
                             print("Error in response: ", unwrappedStatus)
@@ -318,25 +316,25 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
 
     
     @IBAction func lockMapButtion(sender: AnyObject) {
-        if (mapLock == 1) {
+        if (mapLock == true) {
             print("Unlocking map")
-            mapLock = 0
+            mapLock = false
             lockMap.selected = false
         } else {
             print("Locking map")
-            mapLock = 1
+            mapLock = true
             lockMap.selected = true
         }
     }
     
     func updateMap(coord: CLLocation) {
         //If locked
-        if (mapLock == 1) {
+        if (mapLock == true) {
             //Update camera view
             let camera: GMSCameraPosition = GMSCameraPosition.cameraWithTarget(coord.coordinate, zoom: 16.5)
             mapView.camera = camera
             
-            //Update mapView based on new path
+            //Update mapView with padding to show whole path
             let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 130.0)
             mapView.moveCamera(pathBound)
         }
