@@ -102,8 +102,9 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         polyline.strokeWidth = 5.0
         polyline.map = mapView
         
-        //For debug
-        let camera = GMSCameraPosition.cameraWithLatitude(36.131648, longitude: -80.275542, zoom: 16.5)
+        //Set initial location as user's current location
+        //let camera = GMSCameraPosition.cameraWithTarget(origin, zoom: 18)
+        let camera = GMSCameraPosition.cameraWithLatitude(36.131648, longitude: -80.275542, zoom: 18)
         mapView.camera = camera
         
         view.bringSubviewToFront(self.instructionsLabel)
@@ -147,17 +148,22 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         //Update polyline
         polyline.path = path
         
+        //Start updating in locationManager
+        initialLoc = false
+        
         //Update instructions label
         updateInstructionsLabel(stepsArr[0].instructions)
         
         //Put marker on destination
         updateDestMarker(manchester)
+        
     }
     
     /*
         Notes
             1. Can probably simplify HTTP request, later
             2. Check if polyline and marker clearing is working properly (I think it is not). Also updateDestMarker() is not in markerArr, so that won't be removed.
+            3. UpdateMaps if/else statement recently updated, so if map updating is weird, look there
      
         Issues:
             1. Initiate stepsIndex as 0, because if path is short (aka only one step), then locationManager will go out of index (trying to access stepsArr[1] when there is only one step (at [0]))
@@ -174,9 +180,8 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             origin = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude
             )
             
-            print("Updated Origin") //DONT FORGET TO CHANGE API TO GET ORIGIN
+            updateMap(CLLocation(latitude: origin.latitude, longitude: origin.longitude))
             
-            initialLoc = false
         } else { //Else,
             
             //Update map with current location
@@ -339,18 +344,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         instructionsLabel.text = attributedString!.string
     }
     
-    func decodeString(encodedString:String) -> NSAttributedString? {
-        
-        let encodedData = encodedString.dataUsingEncoding(NSUTF8StringEncoding)!
-        
-        do {
-            return try NSAttributedString(data: encodedData, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:NSUTF8StringEncoding], documentAttributes: nil)
-        } catch let error as NSError {
-            print("Error in decoding instructions: ", error.localizedDescription)
-            return nil
-        }
-    }
-    
     func updateDestMarker(destCoord: CLLocationCoordinate2D) {
         let marker = GMSMarker(position: destCoord)
         marker.title = "Destination"
@@ -374,17 +367,18 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     func updateMap(coord: CLLocation) {
         //If locked
         if (mapLock == true) {
-            //Update camera view
-            let camera: GMSCameraPosition = GMSCameraPosition.cameraWithTarget(coord.coordinate, zoom: 16.5)
-            mapView.camera = camera
-            
-            //Update mapView with padding to show whole path
-            if (Int(path.count()) > 0) {
+            //If haven't selected location, point camera to user's current location
+            if (initialLoc == true) {
+                let camera: GMSCameraPosition = GMSCameraPosition.cameraWithTarget(coord.coordinate, zoom: 17.5)
+                mapView.camera = camera
+            }
+            //Or else, update mapView with padding to show whole polyline path
+            else if (Int(path.count()) > 0) {
                 let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 130.0)
                 mapView.moveCamera(pathBound)
             }
         }
-        //Else, don't update mapView
+        //If unlocked, don't update mapView
     }
     
     @IBAction func selectDestinationButton(sender: AnyObject) {
