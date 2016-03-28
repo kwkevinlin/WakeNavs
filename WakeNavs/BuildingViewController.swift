@@ -31,6 +31,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     @IBOutlet weak var mapView: GMSMapView!
     @IBOutlet weak var instructionsLabel: UILabel!
     @IBOutlet weak var lockMap: UIButton!
+    @IBOutlet weak var selectDestination: UIButton!
     
     var locationManager = CLLocationManager()
     
@@ -340,6 +341,11 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         }
         //Else, don't update mapView
     }
+    
+    @IBAction func selectDestinationButton(sender: AnyObject) {
+        print("SelectDest pressed")
+    }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

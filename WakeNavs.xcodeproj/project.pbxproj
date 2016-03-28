@@ -15,6 +15,7 @@
 		77209E761C9CFA870056A4FC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77209E751C9CFA870056A4FC /* Assets.xcassets */; };
 		77209E791C9CFA870056A4FC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 77209E771C9CFA870056A4FC /* LaunchScreen.storyboard */; };
 		77209E851C9D00490056A4FC /* keys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 77209E841C9D00490056A4FC /* keys.plist */; };
+		778236E11CA8D470006BB7FC /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 778236E01CA8D470006BB7FC /* SearchViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		77209E781C9CFA870056A4FC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		77209E7A1C9CFA870056A4FC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		77209E841C9D00490056A4FC /* keys.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = keys.plist; sourceTree = "<group>"; };
+		778236E01CA8D470006BB7FC /* SearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		84CF4278B44F4A45EC2856BB /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		A7B54AF8CF67413C5D74C6E7 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -77,6 +79,7 @@
 				77209E6C1C9CFA870056A4FC /* AppDelegate.swift */,
 				77209E6E1C9CFA870056A4FC /* BuildingViewController.swift */,
 				77209E701C9CFA870056A4FC /* ParkingViewController.swift */,
+				778236E01CA8D470006BB7FC /* SearchViewController.swift */,
 				77209E721C9CFA870056A4FC /* Main.storyboard */,
 				77209E751C9CFA870056A4FC /* Assets.xcassets */,
 				77209E771C9CFA870056A4FC /* LaunchScreen.storyboard */,
@@ -220,6 +223,7 @@
 			files = (
 				77209E711C9CFA870056A4FC /* ParkingViewController.swift in Sources */,
 				77209E6D1C9CFA870056A4FC /* AppDelegate.swift in Sources */,
+				778236E11CA8D470006BB7FC /* SearchViewController.swift in Sources */,
 				77209E6F1C9CFA870056A4FC /* BuildingViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
