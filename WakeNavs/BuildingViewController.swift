@@ -49,8 +49,18 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             36.132314, -80.275765
             Near [5]
             36.132426, -80.275853
-            Near [7] (Major)
+            Near [6] (Major)
             36.132574, -80.275999
+            Near [8]
+            36.132736, -80.276154
+            Near [9]
+            36.132831, -80.276253
+            Near [10]
+            36.133132, -80.276535
+            Near [11]
+            36.133216, -80.276618
+            Near End
+            36.133311, -80.276622
     */
     var collins = CLLocationCoordinate2D(latitude: 36.131648, longitude: -80.275542)
     var manchester = CLLocationCoordinate2D(latitude: 36.133349, longitude: -80.276640)
@@ -64,10 +74,11 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     
     var addPolyline = 0
     var pathIndex = 0
-    var stepIndex = 0
+    var stepIndex = 1
     var mapLock = 1
     
     var oldDist: CLLocationDistance = 0.0
+    var pathCount: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -114,6 +125,9 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             marker.map = mapView
         }
         
+        //Update total number of coordinates in path
+        pathCount = Int(path.count())
+        
         //Update polyline
         polyline.path = path
         
@@ -132,8 +146,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     }
     
     /*
-     
-     Start from here
         Notes
             1. Can probably simplify HTTP request, later
      
@@ -141,8 +153,8 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             Adjust screen when polyline changes
      
         Issues:
-            1. No marker 6? Since no marker 6, use another method to find major end_coordinate
-     
+            1. No outstanding issues atm
+    
      */
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -150,14 +162,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         
         //Update map with current location
         updateMap(location)
-        
-        // If current waypoint is major coordinate, then update instructions label
-        // Each "step" in returned JSON has one directions string and many coordinates for polyline (because road may be curved, etc). Major coordinate = the last coordinate for that particular step.
-        var updateInstructions = 0
-        if (path.coordinateAtIndex(UInt(1)).latitude == stepsArr[stepIndex].coordinates.latitude && path.coordinateAtIndex(UInt(1)).longitude == stepsArr[stepIndex].coordinates.longitude) {
-            print("Next Coordinate is Major")
-            updateInstructions = 1
-        }
         
         /*
             For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment pathIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
@@ -171,30 +175,33 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         let waypoint = CLLocation(latitude: path.coordinateAtIndex(UInt(1)).latitude, longitude: path.coordinateAtIndex(UInt(1)).longitude) //distanceFromLocation only takes CLLocation
         let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
         if (locToWaypoint != oldDist) { //Don't need to print everytime
-            print(locToWaypoint, ", step: ", pathIndex)
+            print(locToWaypoint, ", path: ", pathIndex)
             oldDist = locToWaypoint
         }
         
         //If closer than 6 meters, change polyline to next waypoint
         if (locToWaypoint < 6) {
             //If not on last step
-            if (pathIndex < Int(path.count()) - 1) {
+            if (pathIndex < (pathCount - 1)) {
                 //Remove last path
                 //print("Removing: ", path.coordinateAtIndex(UInt(0)))
+                print("Removing path")
                 path.removeCoordinateAtIndex(UInt(0))
                 pathIndex++
-                
-                if (updateInstructions == 1) {
+    
+                //If finishing current step, update instructions label
+                let nextPath = CLLocation(latitude: path.coordinateAtIndex(UInt(0)).latitude, longitude: path.coordinateAtIndex(UInt(0)).longitude)
+                let endOfCurrentStep = CLLocation(latitude: stepsArr[stepIndex-1].coordinates.latitude, longitude: stepsArr[stepIndex-1].coordinates.longitude)
+                let locToEndStep = endOfCurrentStep.distanceFromLocation(nextPath)
+                if (locToEndStep < 6) {
                     print("Updating Instructions")
                     updateInstructionsLabel(stepsArr[stepIndex].instructions)
-                    stepIndex++
+                    if (stepIndex + 1 < stepsArr.count) {
+                        stepIndex++
+                    }
                 }
                 
-                
-            } else { //Already on last step
-                
             }
-            
             
         }
         
@@ -314,11 +321,11 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         if (mapLock == 1) {
             print("Unlocking map")
             mapLock = 0
-            lockMap.highlighted = false
+            lockMap.selected = false
         } else {
             print("Locking map")
             mapLock = 1
-            lockMap.highlighted = true
+            lockMap.selected = true
         }
     }
     
@@ -330,7 +337,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             mapView.camera = camera
             
             //Update mapView based on new path
-            let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 150.0)
+            let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 130.0)
             mapView.moveCamera(pathBound)
         }
         //Else, don't update mapView
