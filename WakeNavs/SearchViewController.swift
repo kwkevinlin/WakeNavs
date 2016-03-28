@@ -32,7 +32,6 @@ class SearchViewController: UITableViewController {
         return 1
     }
     
-    
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataArray.count
     }
@@ -50,6 +49,32 @@ class SearchViewController: UITableViewController {
         return cell
     }
     
+    //Start
+    var valueToPass:String!
+    
+    override func tableView(tableView: UITableView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
+        print("You selected cell #\(indexPath.row)!")
+        
+        // Get Cell Label
+        let indexPath = tableView.indexPathForSelectedRow!
+        let currentCell = tableView.cellForRowAtIndexPath(indexPath)! as UITableViewCell
+        
+        valueToPass = currentCell.textLabel!.text
+        performSegueWithIdentifier("segueBackWithData", sender: self)
+        
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?){
+        
+        if (segue.identifier == "segueBackWithData") {
+            
+            //Initialize new view controller and cast it as BuildingViewController
+            let viewController = segue.destinationViewController as! BuildingViewController
+            //Passing text of selected to BuildingViewController
+            viewController.passedValue = valueToPass
+        }
+        
+    }
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 60.0

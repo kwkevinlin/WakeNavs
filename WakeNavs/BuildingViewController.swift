@@ -80,6 +80,8 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     var oldDist: CLLocationDistance = 0.0
     var pathCount: Int = 0
     
+    var passedValue: String = ""
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -95,6 +97,26 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         polyline.strokeColor = UIColor.blueColor()
         polyline.strokeWidth = 5.0
         polyline.map = mapView
+        
+        //For debug
+        let camera = GMSCameraPosition.cameraWithLatitude(36.131648, longitude: -80.275542, zoom: 16.5)
+        mapView.camera = camera
+        
+        //Wait until user selects destination
+        while(passedValue == "") {
+            print("Retrieved Destination: ", passedValue)
+        }
+        
+        /*
+            Next:
+                Send destination to callDirectionsAPI
+                Also make origin always user's current location
+        
+            OR even better:
+                Segue calls function instead of passing variable?
+        
+            print("Destination: ", passedValue)
+        */
         
         //Call Google Directions API for turn-by-turn navigataion
         callDirectionsAPI()
@@ -133,10 +155,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         
         //Update instructions label
         updateInstructionsLabel(stepsArr[0].instructions)
-        
-        //For debug
-        let camera = GMSCameraPosition.cameraWithLatitude(36.131648, longitude: -80.275542, zoom: 16.5)
-        mapView.camera = camera
         
         //Put marker on destination
         updateDestMarker(manchester)
@@ -326,6 +344,7 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
             mapLock = true
             lockMap.selected = true
         }
+
     }
     
     func updateMap(coord: CLLocation) {
@@ -345,7 +364,6 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
     @IBAction func selectDestinationButton(sender: AnyObject) {
         print("SelectDest pressed")
     }
-    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
