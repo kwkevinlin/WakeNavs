@@ -79,6 +79,24 @@
             </objects>
             <point key="canvasLocation" x="709" y="129"/>
         </scene>
+        <!--Building View Controller-->
+        <scene sceneID="AN1-zs-28I">
+            <objects>
+                <viewController id="KPQ-sU-yBc" customClass="BuildingViewController" customModule="WakeNavs" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="fVh-Nm-dZL"/>
+                        <viewControllerLayoutGuide type="bottom" id="bsr-Tz-S6E"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="rTQ-WQ-beO">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7Qw-kI-2Gz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="709" y="806"/>
+        </scene>
         <!--Split View Controller-->
         <scene sceneID="Nki-YV-4Qg">
             <objects>

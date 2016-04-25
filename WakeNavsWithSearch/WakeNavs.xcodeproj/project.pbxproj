@@ -14,6 +14,7 @@
 		171E0C871B8E5B84001E6242 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 171E0C861B8E5B84001E6242 /* Assets.xcassets */; };
 		171E0C8A1B8E5B84001E6242 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 171E0C881B8E5B84001E6242 /* LaunchScreen.storyboard */; };
 		171E0CAE1B8E5C58001E6242 /* Building.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171E0CAD1B8E5C58001E6242 /* Building.swift */; };
+		77F7D57E1CCDCFFC00CAA6A1 /* BuildingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F7D57D1CCDCFFC00CAA6A1 /* BuildingViewController.swift */; };
 		C2AB3322970C619AB09CE528 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25BB4A7E7AADF5A2D4E43022 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,7 @@
 		25BB4A7E7AADF5A2D4E43022 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DCC2D194D9BBB5E87A83F0F /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		6483FD50DEC8AC3BA5EE5AE2 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		77F7D57D1CCDCFFC00CAA6A1 /* BuildingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BuildingViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 			children = (
 				171E0C7D1B8E5B84001E6242 /* AppDelegate.swift */,
 				171E0C7F1B8E5B84001E6242 /* MasterViewController.swift */,
+				77F7D57D1CCDCFFC00CAA6A1 /* BuildingViewController.swift */,
 				171E0C811B8E5B84001E6242 /* DetailViewController.swift */,
 				171E0CAD1B8E5C58001E6242 /* Building.swift */,
 				171E0C831B8E5B84001E6242 /* Main.storyboard */,
@@ -129,7 +132,7 @@
 				TargetAttributes = {
 					171E0C791B8E5B84001E6242 = {
 						CreatedOnToolsVersion = 7.0;
-						DevelopmentTeam = 9HU59Z4X44;
+						DevelopmentTeam = A2W7M425TE;
 						SystemCapabilities = {
 							com.apple.Maps.iOS = {
 								enabled = 0;
@@ -223,6 +226,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				171E0C821B8E5B84001E6242 /* DetailViewController.swift in Sources */,
+				77F7D57E1CCDCFFC00CAA6A1 /* BuildingViewController.swift in Sources */,
 				171E0CAE1B8E5C58001E6242 /* Building.swift in Sources */,
 				171E0C801B8E5B84001E6242 /* MasterViewController.swift in Sources */,
 				171E0C7E1B8E5B84001E6242 /* AppDelegate.swift in Sources */,
