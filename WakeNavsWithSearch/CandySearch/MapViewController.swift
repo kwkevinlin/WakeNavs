@@ -62,8 +62,23 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     var passedValue: String = ""
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setTitle()
+    }
     
-    
+    @IBAction func lockMapButton(sender: AnyObject) {
+        if (mapLock == true) {
+            print("Unlocking map")
+            mapLock = false
+            lockMap.selected = false
+        } else {
+            print("Locking map")
+            mapLock = true
+            lockMap.selected = true
+        }
+
+    }
     
     
     
@@ -80,11 +95,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         if let detailBuilding = detailBuilding {
             title = detailBuilding.name
         }
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setTitle()
     }
     
     override func didReceiveMemoryWarning() {

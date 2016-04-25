@@ -40,12 +40,17 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xcl-Kh-rI1">
                                 <rect key="frame" x="0.0" y="64" width="600" height="68"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ulJ-Cg-N1x">
+                                    <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ulJ-Cg-N1x">
                                         <rect key="frame" x="8" y="19" width="73" height="30"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="73" id="aqP-k2-Vm4"/>
                                         </constraints>
-                                        <state key="normal" title="Lock Map"/>
+                                        <state key="normal" title="Lock Map">
+                                            <color key="titleColor" red="0.15320454040000001" green="0.56275137070000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="lockMapButton:" destination="JEX-9P-axG" eventType="touchUpInside" id="WAD-az-OHa"/>
+                                        </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Instructions" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QdY-Kp-9v1">
                                         <rect key="frame" x="119" y="23" width="371" height="21"/>
