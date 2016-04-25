@@ -139,11 +139,13 @@ class BuildingViewController: UIViewController, CLLocationManagerDelegate, GMSMa
         pathCount = Int(path.count())
         
         //Adding markers to ALL coordinates for test
+        /*
         for (var i = 0; i < pathCount; i++) {
             markerArr.append(GMSMarker(position: path.coordinateAtIndex(UInt(i))))
             markerArr[markerArr.count - 1].title = String(i)
             markerArr[markerArr.count - 1].map = mapView
         }
+        */
         
         //Update polyline
         polyline.path = path

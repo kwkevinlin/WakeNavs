@@ -23,7 +23,7 @@ class SearchViewController: UITableViewController {
         tblSearchResults.delegate = self
         tblSearchResults.dataSource = self
         
-        dataArray = ["Collins", "Manchester"]
+        dataArray = ["Collins", "Manchester", "Tribble", "Olin", "ZSR Library", "Farrell", "Greene", "Huffman", "Polo", "Magnolia", "Dogwood"]
         tblSearchResults.reloadData()
     
     }
