@@ -4,7 +4,7 @@ import UIKit
 class MasterViewController: UITableViewController {
     
     // MARK: - Properties
-    var detailViewController: DetailViewController? = nil
+    var mapViewController: MapViewController? = nil
     var buildings = [Building]()
     var filteredBuildings = [Building]()
     let searchController = UISearchController(searchResultsController: nil)
@@ -131,7 +131,7 @@ class MasterViewController: UITableViewController {
         
         if let splitViewController = splitViewController {
             let controllers = splitViewController.viewControllers
-            detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
+            mapViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? MapViewController
         }
     }
     
@@ -187,7 +187,7 @@ class MasterViewController: UITableViewController {
                 } else {
                     building = buildings[indexPath.row]
                 }
-                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! DetailViewController
+                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! MapViewController
                 controller.detailBuilding = building
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem()
                 controller.navigationItem.leftItemsSupplementBackButton = true
