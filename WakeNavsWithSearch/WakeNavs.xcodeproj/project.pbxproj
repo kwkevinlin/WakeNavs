@@ -15,6 +15,7 @@
 		171E0C8A1B8E5B84001E6242 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 171E0C881B8E5B84001E6242 /* LaunchScreen.storyboard */; };
 		171E0CAE1B8E5C58001E6242 /* Building.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171E0CAD1B8E5C58001E6242 /* Building.swift */; };
 		77F7D5801CCDD11A00CAA6A1 /* keys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 77F7D57F1CCDD11A00CAA6A1 /* keys.plist */; };
+		77F7D5821CCDDD2F00CAA6A1 /* Steps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77F7D5811CCDDD2F00CAA6A1 /* Steps.swift */; };
 		C2AB3322970C619AB09CE528 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25BB4A7E7AADF5A2D4E43022 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +33,7 @@
 		3DCC2D194D9BBB5E87A83F0F /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		6483FD50DEC8AC3BA5EE5AE2 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		77F7D57F1CCDD11A00CAA6A1 /* keys.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = keys.plist; sourceTree = "<group>"; };
+		77F7D5811CCDDD2F00CAA6A1 /* Steps.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Steps.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 				171E0C7F1B8E5B84001E6242 /* MasterViewController.swift */,
 				171E0C811B8E5B84001E6242 /* MapViewController.swift */,
 				77F7D57F1CCDD11A00CAA6A1 /* keys.plist */,
+				77F7D5811CCDDD2F00CAA6A1 /* Steps.swift */,
 				171E0CAD1B8E5C58001E6242 /* Building.swift */,
 				171E0C831B8E5B84001E6242 /* Main.storyboard */,
 				171E0C861B8E5B84001E6242 /* Assets.xcassets */,
@@ -227,6 +230,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				171E0C821B8E5B84001E6242 /* MapViewController.swift in Sources */,
+				77F7D5821CCDDD2F00CAA6A1 /* Steps.swift in Sources */,
 				171E0CAE1B8E5C58001E6242 /* Building.swift in Sources */,
 				171E0C801B8E5B84001E6242 /* MasterViewController.swift in Sources */,
 				171E0C7E1B8E5B84001E6242 /* AppDelegate.swift in Sources */,

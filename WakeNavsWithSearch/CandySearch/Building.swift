@@ -1,14 +1,7 @@
-
 import Foundation
 import CoreLocation
 
-//struct Candy {
-//  let category : String
-//  let name : String
-//}
-
-class Building
-{
+class Building {
     var name:       String = ""
     var keyWords =  [String]()
     var longtitude: Double
@@ -16,8 +9,7 @@ class Building
     var loc: CLLocationCoordinate2D
     var catogory: String = ""
     
-    init(myName: String, myKeyWords: [String], myLatitude: Double, myLongtitude: Double, myCatogory: String)
-    {
+    init(myName: String, myKeyWords: [String], myLatitude: Double, myLongtitude: Double, myCatogory: String) {
         self.name       = myName
         self.keyWords   = myKeyWords
         self.latitude   = myLatitude
