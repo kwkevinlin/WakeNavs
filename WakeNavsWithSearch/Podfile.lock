@@ -1,10 +1,13 @@
 PODS:
   - GoogleMaps (1.13.0)
+  - MGSwipeTableCell (1.5.5)
 
 DEPENDENCIES:
   - GoogleMaps
+  - MGSwipeTableCell
 
 SPEC CHECKSUMS:
   GoogleMaps: 7a6caeb8336d7cb42982e969fc9b1b20a889fe79
+  MGSwipeTableCell: bafeb5f351124544c9364ecbdf24c7b06a37d340
 
 COCOAPODS: 0.39.0
