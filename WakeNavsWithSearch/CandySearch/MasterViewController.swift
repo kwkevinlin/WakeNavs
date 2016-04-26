@@ -1,13 +1,18 @@
 
 import UIKit
+import CoreLocation
 
-class MasterViewController: UITableViewController {
+class MasterViewController: UITableViewController, CLLocationManagerDelegate {
     
     // MARK: - Properties
     var mapViewController: MapViewController? = nil
     var buildings = [Building]()
     var filteredBuildings = [Building]()
     let searchController = UISearchController(searchResultsController: nil)
+    
+    // Origin location
+    var locationManager = CLLocationManager()
+    var origin = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
     
     // MARK: - View Setup
     override func viewDidLoad() {
@@ -23,6 +28,11 @@ class MasterViewController: UITableViewController {
         searchController.searchBar.scopeButtonTitles = ["All", "Residence", "Academic", "Athletics" ,"Other"]
         tableView.tableHeaderView = searchController.searchBar
         
+        // Retreive user's location
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.startUpdatingLocation()
         
         //building data defined here
         buildings =
@@ -135,6 +145,13 @@ class MasterViewController: UITableViewController {
         }
     }
     
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations[locations.count - 1]
+        
+        origin = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude
+        )
+    }
+    
     override func viewWillAppear(animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.collapsed
         super.viewWillAppear(animated)
@@ -188,9 +205,14 @@ class MasterViewController: UITableViewController {
                     building = buildings[indexPath.row]
                 }
                 let controller = (segue.destinationViewController as! UINavigationController).topViewController as! MapViewController
+                
+                //Set selected building
                 controller.detailBuilding = building
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem()
                 controller.navigationItem.leftItemsSupplementBackButton = true
+                
+                //Set origin location
+                controller.origin = origin
             }
         }
     }

@@ -91,6 +91,7 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="instructionsLabel" destination="QdY-Kp-9v1" id="OFe-v0-SIQ"/>
+                        <outlet property="lockMap" destination="Wkl-XA-Hp0" id="aBu-oq-Uf8"/>
                         <outlet property="mapView" destination="3i0-ys-6fS" id="23V-Eh-pEb"/>
                     </connections>
                 </viewController>

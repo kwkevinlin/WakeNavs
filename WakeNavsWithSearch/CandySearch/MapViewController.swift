@@ -4,11 +4,11 @@ import CoreLocation
 
 class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {
     
-    var locationManager = CLLocationManager()
-    
     @IBOutlet weak var mapView: GMSMapView!
     @IBOutlet weak var lockMap: UIButton!
     @IBOutlet weak var instructionsLabel: UILabel!
+    
+    var locationManager = CLLocationManager()
     
     /*
         Test coordinates:
@@ -71,9 +71,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         //Get Directions API key
         getAPIKey()
         
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.delegate = self
+        destination = manchester //Test
+        
         locationManager.requestWhenInUseAuthorization()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
         
         mapView.myLocationEnabled = true
@@ -93,6 +95,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     }
     
     func setupMapView() {
+        
+        //Setup selected destination
+        destination = (detailBuilding?.loc)!
+        print("Destination:", destination)
         
         //Call Google Directions API for turn-by-turn navigataion
         callDirectionsAPI()
@@ -141,9 +147,87 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
     }
     
+    /*
+        Notes
+            1. Can probably simplify HTTP request, later
+            2. Check if polyline and marker clearing is working properly (I think it is not). Also updateDestMarker() is not in markerArr, so that won't be removed.
+            3. UpdateMaps if/else statement recently updated, so if map updating is weird, look there
+    
+        Issues:
+            1. Initiate stepsIndex as 0, because if path is short (aka only one step), then locationManager will go out of index (trying to access stepsArr[1] when there is only one step (at [0]))
+    
+    */
+    
+    //Implement locationManager
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations[locations.count - 1]
+        
+        print("Updating location..")
+        
+        //Just to retrieve initial locations for setup
+        if (initialLoc == true) {
+            
+            //Set navigation origin location to current GPS location
+            origin = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude
+            )
+            
+            updateMap(CLLocation(latitude: origin.latitude, longitude: origin.longitude))
+            
+        } else { //Else,
+            
+            //Update map with current location
+            updateMap(location)
+            
+            /*
+            For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment pathIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
+            */
+            
+            //Replace polyline to start display from where you are
+            path.replaceCoordinateAtIndex(UInt(0), withCoordinate: CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude))
+            polyline.path = path
+            
+            //Get distance from current to next waypoint in path
+            let waypoint = CLLocation(latitude: path.coordinateAtIndex(UInt(1)).latitude, longitude: path.coordinateAtIndex(UInt(1)).longitude) //distanceFromLocation only takes CLLocation
+            let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
+            if (locToWaypoint != oldDist) { //Don't need to print everytime
+                print(locToWaypoint, ", path: ", pathIndex)
+                oldDist = locToWaypoint
+            }
+            
+            //If closer than 6 meters, change polyline to next waypoint
+            if (locToWaypoint < 6) {
+                //If not on last step
+                if (pathIndex < (pathCount - 1)) {
+                    //Remove last path
+                    //print("Removing: ", path.coordinateAtIndex(UInt(0)))
+                    print("Removing path")
+                    path.removeCoordinateAtIndex(UInt(0))
+                    pathIndex++
+                    
+                    //If finishing current step, update instructions label
+                    let nextPath = CLLocation(latitude: path.coordinateAtIndex(UInt(0)).latitude, longitude: path.coordinateAtIndex(UInt(0)).longitude)
+                    let endOfCurrentStep = CLLocation(latitude: stepsArr[stepIndex-1].coordinates.latitude, longitude: stepsArr[stepIndex-1].coordinates.longitude)
+                    let locToEndStep = endOfCurrentStep.distanceFromLocation(nextPath)
+                    if (locToEndStep < 6) {
+                        print("Updating Instructions")
+                        updateInstructionsLabel(stepsArr[stepIndex].instructions)
+                        if (stepIndex + 1 < stepsArr.count) {
+                            stepIndex++
+                        }
+                    }
+                    
+                }
+                
+            }
+        }
+        
+    }
+    
     func callDirectionsAPI() {
-        //let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(origin.latitude),\(origin.longitude)&destination=\(destination.latitude),\(destination.longitude)&mode=walking&key=\(ServerAPIKey)"
-        let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(collins.latitude),\(collins.longitude)&destination=\(manchester.latitude),\(manchester.longitude)&mode=walking&key=\(ServerAPIKey)"
+        let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(origin.latitude),\(origin.longitude)&destination=\(destination.latitude),\(destination.longitude)&mode=walking&key=\(ServerAPIKey)"
+        //let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(collins.latitude),\(collins.longitude)&destination=\(manchester.latitude),\(manchester.longitude)&mode=walking&key=\(ServerAPIKey)"
+        
+        print("Origin:", origin)
         
         //Make HTTP request
         let requestURL: NSURL = NSURL(string: endpoint)!
@@ -231,6 +315,23 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             lockMap.selected = true
         }
 
+    }
+    
+    func updateMap(coord: CLLocation) {
+        //If locked
+        if (mapLock == true) {
+            //If haven't selected location, point camera to user's current location
+            if (initialLoc == true) {
+                let camera: GMSCameraPosition = GMSCameraPosition.cameraWithTarget(coord.coordinate, zoom: 17.5)
+                mapView.camera = camera
+            }
+                //Or else, update mapView with padding to show whole polyline path
+            else if (Int(path.count()) > 0) {
+                let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 130.0)
+                mapView.moveCamera(pathBound)
+            }
+        }
+        //If unlocked, don't update mapView
     }
     
     func getAPIKey() {
