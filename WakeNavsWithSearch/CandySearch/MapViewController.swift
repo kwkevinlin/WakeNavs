@@ -123,7 +123,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         //Update total number of coordinates in path
         pathCount = Int(path.count())
         
-        //Adding markers to ALL coordinates for test
+        //Adding markers to ALL coordinates for testing
         /*
         for (var i = 0; i < pathCount; i++) {
         markerArr.append(GMSMarker(position: path.coordinateAtIndex(UInt(i))))
@@ -140,15 +140,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     /*
     Notes
     1. Can probably simplify HTTP request, later
-    2. Check if polyline and marker clearing is working properly (I think it is not). Also updateDestMarker() is not in markerArr, so that won't be removed.
-    3. UpdateMaps if/else statement recently updated, so if map updating is weird, look there
     
     Issues:
     1. Initiate stepsIndex as 0, because if path is short (aka only one step), then locationManager will go out of index (trying to access stepsArr[1] when there is only one step (at [0]))
     2. LocationManager remains to update even after going back to table view to reselect destination
     
     Fixes:
-    1. Padding is non-optimal yet. Priority for fix.
+    1. Padding is not the best yet. Priority for fix.
     
     */
     
@@ -298,7 +296,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         if (mapLock == true) {
             //If polyline is present, update mapView with padding
             if (Int(path.count()) > 0) {
-                let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 130.0)
+                let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 85.0)
                 mapView.moveCamera(pathBound)
             }
         }
