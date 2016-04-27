@@ -25,6 +25,9 @@ class MasterViewController: UITableViewController, CLLocationManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Populate buildings array
+        defineBuildings()
+        
         // Setup the Search Controller
         searchController.searchResultsUpdater = self
         searchController.searchBar.delegate = self
@@ -40,8 +43,145 @@ class MasterViewController: UITableViewController, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
+        
+        if let splitViewController = splitViewController {
+            let controllers = splitViewController.viewControllers
+            detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
+        }
+    }
+    
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations[locations.count - 1]
+        
+        origin = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude
+        )
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        clearsSelectionOnViewWillAppear = splitViewController!.collapsed
+        super.viewWillAppear(animated)
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if searchController.active && searchController.searchBar.text != "" {
+            return filteredBuildings.count
+        }
+        return buildings.count
+    }
+    
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
+        let reuseIdentifier = "programmaticCell"
+        var cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! MGSwipeTableCell!
+        if cell == nil {
+            cell = MGSwipeTableCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: reuseIdentifier)
+        }
+        
+        let building: Building
+        if searchController.active && searchController.searchBar.text != "" {
+            building = filteredBuildings[indexPath.row]
+        } else {
+            building = buildings[indexPath.row]
+        }
+        
+        cell.textLabel!.text = building.name
+        cell.detailTextLabel!.text = building.searchWord
+        
+        // Create "Navigate" button on swipe right
+        cell.rightButtons =  [MGSwipeButton(title: "Navigate", backgroundColor: UIColor.brownColor(), callback: {
+        (sender: MGSwipeTableCell!) -> Bool in
+        self.performSegueWithIdentifier("showMap", sender: self)
+            return true
+        })]
+        cell.rightSwipeSettings.transition = MGSwipeTransition.Rotate3D
+        
+        // Create "Show Details" button on swipe left
+        cell.leftButtons = [ MGSwipeButton(title: "Show Details", backgroundColor: UIColor.brownColor(), callback: {
+            (sender: MGSwipeTableCell!) -> Bool in
+            self.performSegueWithIdentifier("showDetail", sender: self)
+            return true
+        })]
+        cell.leftSwipeSettings.transition = MGSwipeTransition.Rotate3D
+        
+        return cell
+    }
 
-        //building data defined here
+    
+    
+    func filterContentForSearchText(searchText: String, scope: String = "All" ) {
+        filteredBuildings = buildings.filter({
+                (building : Building) -> Bool in
+                let categoryMatch = (scope == "All") || (building.catogory == scope)
+                var found = false;
+                
+                if categoryMatch && building.name.lowercaseString.containsString(searchText.lowercaseString) {
+                    found = true;
+                }
+            
+                for x in building.keyWords {
+                    if categoryMatch && x.lowercaseString.containsString(searchText.lowercaseString) {
+                        found = true;
+                        building.searchWord = x;
+                    }
+                }
+                return found;
+            }
+        )
+        tableView.reloadData()
+    }
+    
+    // Pass along selected destination and user's coordinates before segue to detail/map view
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "showDetail" {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let building: Building
+                if searchController.active && searchController.searchBar.text != "" {
+                    building = filteredBuildings[indexPath.row]
+                } else {
+                    building = buildings[indexPath.row]
+                }
+                
+                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! DetailViewController
+                
+                //Set selected building
+                controller.detailBuilding = building
+                controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem()
+                controller.navigationItem.leftItemsSupplementBackButton = true
+                
+            }
+        } else if segue.identifier == "showMap" {
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let building: Building
+                if searchController.active && searchController.searchBar.text != "" {
+                    building = filteredBuildings[indexPath.row]
+                } else {
+                    building = buildings[indexPath.row]
+                }
+                
+                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! MapViewController
+                
+                // Send building to MapViewController
+                controller.detailBuilding = building
+                controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem()
+                controller.navigationItem.leftItemsSupplementBackButton = true
+                
+                // Set origin location
+                controller.origin = origin
+            }
+        }
+    }
+    
+    // Define buildings array for table view
+    func defineBuildings() {
         buildings =
             [
                 Building(myName:"Alumni Hall",myKeyWords:["Alumni Hall","Deacon One Card Office","Office of the Vice President", "University Development", "Alumni and Donor Services", "Communications and External Relations","Wake Forest Magazine", "University Advancement","Residence Life and Housing Office"],myLatitude: 36.137843,myLongtitude: -80.275388, myCatogory: "Other", myURL: "http://zsr.wfu.edu/special/exhibit/wfu-buildings-and-roads/alumni-hall/"),
@@ -150,147 +290,6 @@ class MasterViewController: UITableViewController, CLLocationManagerDelegate {
                 
                 Building(myName:"Visitor Parking @ Benson",myKeyWords:["Benson Parking","Lot C","Post Office"],myLatitude: 36.133167,   myLongtitude:  -80.278256, myCatogory: "Other", myURL: "http://www.wfu.edu/visitors")
         ]
-        
-        
-        if let splitViewController = splitViewController {
-            let controllers = splitViewController.viewControllers
-            detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
-        }
-    }
-    
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let location = locations[locations.count - 1]
-        
-        origin = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude
-        )
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        clearsSelectionOnViewWillAppear = splitViewController!.collapsed
-        super.viewWillAppear(animated)
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
-    
-    // MARK: - Table View
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchController.active && searchController.searchBar.text != "" {
-            return filteredBuildings.count
-        }
-        return buildings.count
-    }
-    
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
-        let reuseIdentifier = "programmaticCell"
-        var cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! MGSwipeTableCell!
-        if cell == nil {
-            cell = MGSwipeTableCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: reuseIdentifier)
-        }
-        
-        //let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
-        let building: Building
-        if searchController.active && searchController.searchBar.text != "" {
-            building = filteredBuildings[indexPath.row]
-        } else {
-            building = buildings[indexPath.row]
-        }
-        
-        cell.textLabel!.text = building.name
-        cell.detailTextLabel!.text = building.searchWord
-        
-        //Create "Navigate" button on swipe right
-        cell.rightButtons =  [MGSwipeButton(title: "Navigate", backgroundColor: UIColor.brownColor(), callback: {
-        (sender: MGSwipeTableCell!) -> Bool in
-        self.performSegueWithIdentifier("showMap", sender: self)
-            return true
-        })]
-        cell.rightSwipeSettings.transition = MGSwipeTransition.Rotate3D
-        
-        //Create "Show Details" button on swipe left
-        cell.leftButtons = [ MGSwipeButton(title: "Show Details", backgroundColor: UIColor.brownColor(), callback: {
-            (sender: MGSwipeTableCell!) -> Bool in
-            self.performSegueWithIdentifier("showDetail", sender: self)
-            return true
-        })]
-        cell.leftSwipeSettings.transition = MGSwipeTransition.Rotate3D
-        
-        //Set delegate
-        
-        return cell
-    }
-
-    
-    
-    func filterContentForSearchText(searchText: String, scope: String = "All" ) {
-        filteredBuildings = buildings.filter({
-                (building : Building) -> Bool in
-                let categoryMatch = (scope == "All") || (building.catogory == scope)
-                var found = false;
-                
-                if categoryMatch && building.name.lowercaseString.containsString(searchText.lowercaseString) {
-                    found = true;
-                }
-                
-                
-                for x in building.keyWords {
-                    if categoryMatch && x.lowercaseString.containsString(searchText.lowercaseString) {
-                        found = true;
-                        building.searchWord = x;
-                    }
-                }
-                return found;
-            }
-        )
-        tableView.reloadData()
-    }
-    
-    // MARK: - Segues
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "showDetail" {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                let building: Building
-                if searchController.active && searchController.searchBar.text != "" {
-                    building = filteredBuildings[indexPath.row]
-                } else {
-                    building = buildings[indexPath.row]
-                }
-                
-                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! DetailViewController
-                
-                //Set selected building
-                controller.detailBuilding = building
-                controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem()
-                controller.navigationItem.leftItemsSupplementBackButton = true
-                
-            }
-        } else if segue.identifier == "showMap" {
-            
-            if let indexPath = tableView.indexPathForSelectedRow {
-                let building: Building
-                if searchController.active && searchController.searchBar.text != "" {
-                    building = filteredBuildings[indexPath.row]
-                } else {
-                    building = buildings[indexPath.row]
-                }
-                
-                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! MapViewController
-                
-                //Send building to MapViewController
-                controller.detailBuilding = building
-                controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem()
-                controller.navigationItem.leftItemsSupplementBackButton = true
-                
-                //Set origin location
-                controller.origin = origin
-            }
-        }
     }
 }
 

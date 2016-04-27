@@ -124,7 +124,7 @@
 			dependencies = (
 			);
 			name = WakeNavs;
-			productName = CandySearch;
+			productName = WakeNavs;
 			productReference = 171E0C7A1B8E5B84001E6242 /* WakeNavs.app */;
 			productType = "com.apple.product-type.application";
 		};
