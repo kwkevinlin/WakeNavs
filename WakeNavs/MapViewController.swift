@@ -128,7 +128,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                 //Update instructions label
                 if (stepsArr.count == 0) {
                     //Location not updating or did not "select then click"
-                    print("Error in update instructions label")
+                    print("Error in update instructions label. Location services not working in simulator?") //Print(anything) in MasterView location delegate. Simulator bug?
                     updateInstructionsLabel("Please check your GPS signal")
                 } else {
                     updateInstructionsLabel(stepsArr[0].instructions)
@@ -184,7 +184,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                      https://maps.googleapis.com/maps/api/directions/json?origin=36.131648,-80.275542&destination=36.133349,-80.276640&mode=walking&key="REPLACE SERVER KEY HERE"
                      */
                     
-                    //Parse JSON (messy)
+                    //Parse JSON
                     if let unwrappedStatus = JSON["status"] as? String {
                         //If response is successful from Google
                         if unwrappedStatus == "OK" {
@@ -197,15 +197,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                                     
                                     //Add coordinates path, instead of using encoded polyline
                                     if let coorLat = step["end_location"]!["lat"] as? Double {                                        if let coorLong = step["end_location"]!["lng"] as? Double {
-                                            if let dist = step["distance"]!["value"] as? Int {
-                                                if let dur = step["duration"]!["value"] as? Int {
-                                                    if let instructions = step["html_instructions"] as? String {
-                                                        if let encPoly = step["polyline"]!["points"] as? String {
-                                                            //Storing to stepsArr
-                                                            self.stepsArr.append(Steps(dur: dur, dist: dist, coor: CLLocationCoordinate2DMake(coorLat, coorLong), poly: encPoly, inst: instructions))
-                                                        
-                                                        }
-                                                    }
+                                            if let instructions = step["html_instructions"] as? String {
+                                                if let encPoly = step["polyline"]!["points"] as? String {
+                                                    //Storing to stepsArr
+                                                    self.stepsArr.append(Steps(coor: CLLocationCoordinate2DMake(coorLat, coorLong), poly: encPoly, inst: instructions))
                                                 }
                                             }
                                         }
