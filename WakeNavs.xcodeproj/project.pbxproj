@@ -72,17 +72,17 @@
 		171E0C7C1B8E5B84001E6242 /* WakeNavs */ = {
 			isa = PBXGroup;
 			children = (
-				2BE72C2A1CD042F20050558B /* Steps.swift */,
-				2BE72C281CD042EB0050558B /* keys.plist */,
 				171E0C7D1B8E5B84001E6242 /* AppDelegate.swift */,
 				171E0C7F1B8E5B84001E6242 /* MasterViewController.swift */,
-				2B1A30921CD033CB003B56E5 /* MapViewController.swift */,
 				171E0C811B8E5B84001E6242 /* DetailViewController.swift */,
+				2B1A30921CD033CB003B56E5 /* MapViewController.swift */,
 				171E0CAD1B8E5C58001E6242 /* Building.swift */,
+				2BE72C2A1CD042F20050558B /* Steps.swift */,
 				171E0C831B8E5B84001E6242 /* Main.storyboard */,
 				171E0C861B8E5B84001E6242 /* Assets.xcassets */,
 				171E0C881B8E5B84001E6242 /* LaunchScreen.storyboard */,
 				171E0C8B1B8E5B84001E6242 /* Info.plist */,
+				2BE72C281CD042EB0050558B /* keys.plist */,
 				2B1A30851CCF017B003B56E5 /* WakeNavs-Bridging-Header.h */,
 			);
 			name = WakeNavs;

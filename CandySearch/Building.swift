@@ -1,14 +1,7 @@
-
 import Foundation
 import CoreLocation
 
-//struct Candy {
-//  let category : String
-//  let name : String
-//}
-
-class Building
-{
+class Building {
     var name:       String = ""
     var keyWords =  [String]()
     var longtitude: Double

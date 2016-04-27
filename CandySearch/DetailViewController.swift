@@ -8,56 +8,40 @@
 
 import UIKit
 
-class DetailViewController: UIViewController
-{
-    //@IBOutlet weak var detailDescriptionLabel: UILabel!
+class DetailViewController: UIViewController {
+    
     @IBOutlet weak var webView: UIWebView!
-    var  theURL : String = ""
-    var canGoBack: Bool = true
-    var canGoForward: Bool = true
-
     @IBOutlet weak var detailDescriptionLabel: UILabel!
     
-    override func viewDidLoad()
-    {
+    override func viewDidLoad() {
         super.viewDidLoad()
+        
         configureView()
         detailDescriptionLabel.hidden = true
     }
     
-    var detailBuilding: Building?
-    {
-        didSet
-        {
+    var detailBuilding: Building? {
+        didSet {
             configureView()
         }
     }
     
-    func configureView()
-    {
-        
-        if let detailBuilding = detailBuilding
-        {
-            
-            if let detailDescriptionLabel = detailDescriptionLabel
-            {
+    func configureView() {
+        if let detailBuilding = detailBuilding {
+            if let detailDescriptionLabel = detailDescriptionLabel {
                 
                 detailDescriptionLabel.text = detailBuilding.name
                 title = detailBuilding.name
-                theURL = detailBuilding.detailURL
                 
-                // Do any additional setup after loading the view, typically from a nib.
-                let url = NSURL (string: theURL);
+                //Load webView
+                let url = NSURL(string: detailBuilding.detailURL);
                 let requestObj = NSURLRequest(URL: url!);
                 webView.loadRequest(requestObj);
             }
         }
     }
     
-    
-    
-    override func didReceiveMemoryWarning()
-    {
+    override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     

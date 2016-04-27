@@ -9,7 +9,7 @@
 import UIKit
 import CoreLocation
 
-class MasterViewController: UITableViewController, CLLocationManagerDelegate, MGSwipeTableCellDelegate {
+class MasterViewController: UITableViewController, CLLocationManagerDelegate {
     
     // MARK: - Properties
     var detailViewController: DetailViewController? = nil
@@ -22,8 +22,7 @@ class MasterViewController: UITableViewController, CLLocationManagerDelegate, MG
     var origin = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
     
     // MARK: - View Setup
-    override func viewDidLoad()
-    {
+    override func viewDidLoad() {
         super.viewDidLoad()
         
         // Setup the Search Controller
@@ -153,8 +152,7 @@ class MasterViewController: UITableViewController, CLLocationManagerDelegate, MG
         ]
         
         
-        if let splitViewController = splitViewController
-        {
+        if let splitViewController = splitViewController {
             let controllers = splitViewController.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
@@ -167,116 +165,82 @@ class MasterViewController: UITableViewController, CLLocationManagerDelegate, MG
         )
     }
     
-    override func viewWillAppear(animated: Bool)
-    {
+    override func viewWillAppear(animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.collapsed
         super.viewWillAppear(animated)
     }
     
-    override func didReceiveMemoryWarning()
-    {
+    override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
     // MARK: - Table View
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int
-    {
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int
-    {
-        if searchController.active && searchController.searchBar.text != ""
-        {
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if searchController.active && searchController.searchBar.text != "" {
             return filteredBuildings.count
         }
         return buildings.count
     }
     
-  /*
-    
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
-    {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
-        let building: Building
-        if searchController.active && searchController.searchBar.text != ""
-        {
-            building = filteredBuildings[indexPath.row]
-        }
-        else
-        {
-            building = buildings[indexPath.row]
-        }
-        cell.textLabel!.text = building.name
-        cell.detailTextLabel!.text = building.searchWord
-        return cell
-    }
- */
-   
-    
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
-    {
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
         let reuseIdentifier = "programmaticCell"
         var cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! MGSwipeTableCell!
-        if cell == nil
-        {
+        if cell == nil {
             cell = MGSwipeTableCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: reuseIdentifier)
         }
         
         //let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
         let building: Building
-        if searchController.active && searchController.searchBar.text != ""
-        {
+        if searchController.active && searchController.searchBar.text != "" {
             building = filteredBuildings[indexPath.row]
-        }
-        else
-        {
+        } else {
             building = buildings[indexPath.row]
         }
         
         cell.textLabel!.text = building.name
         cell.detailTextLabel!.text = building.searchWord
         
-        //configure right buttons
-       // cell.rightButtons = [MGSwipeButton(title: "Details",backgroundColor: UIColor.brownColor())]
+        //Create "Navigate" button on swipe right
         cell.rightButtons =  [MGSwipeButton(title: "Navigate", backgroundColor: UIColor.brownColor(), callback: {
         (sender: MGSwipeTableCell!) -> Bool in
         self.performSegueWithIdentifier("showMap", sender: self)
             return true
         })]
+        cell.rightSwipeSettings.transition = MGSwipeTransition.Rotate3D
         
+        //Create "Show Details" button on swipe left
         cell.leftButtons = [ MGSwipeButton(title: "Show Details", backgroundColor: UIColor.brownColor(), callback: {
             (sender: MGSwipeTableCell!) -> Bool in
             self.performSegueWithIdentifier("showDetail", sender: self)
             return true
         })]
+        cell.leftSwipeSettings.transition = MGSwipeTransition.Rotate3D
         
-        cell.rightSwipeSettings.transition = MGSwipeTransition.Rotate3D
-        cell.delegate = self
+        //Set delegate
         
         return cell
     }
 
     
     
-    func filterContentForSearchText(searchText: String, scope: String = "All" )
-    {
-        filteredBuildings = buildings.filter(
-            {
+    func filterContentForSearchText(searchText: String, scope: String = "All" ) {
+        filteredBuildings = buildings.filter({
                 (building : Building) -> Bool in
                 let categoryMatch = (scope == "All") || (building.catogory == scope)
                 var found = false;
                 
-                if categoryMatch && building.name.lowercaseString.containsString(searchText.lowercaseString)
-                {
+                if categoryMatch && building.name.lowercaseString.containsString(searchText.lowercaseString) {
                     found = true;
                 }
                 
                 
-                for x in building.keyWords
-                {
-                    if categoryMatch && x.lowercaseString.containsString(searchText.lowercaseString)
-                    {
+                for x in building.keyWords {
+                    if categoryMatch && x.lowercaseString.containsString(searchText.lowercaseString) {
                         found = true;
                         building.searchWord = x;
                     }
@@ -288,20 +252,13 @@ class MasterViewController: UITableViewController, CLLocationManagerDelegate, MG
     }
     
     // MARK: - Segues
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?)
-    {
-        if segue.identifier == "showDetail"
-        {
-            
-            if let indexPath = tableView.indexPathForSelectedRow
-            {
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "showDetail" {
+            if let indexPath = tableView.indexPathForSelectedRow {
                 let building: Building
-                if searchController.active && searchController.searchBar.text != ""
-                {
+                if searchController.active && searchController.searchBar.text != "" {
                     building = filteredBuildings[indexPath.row]
-                }
-                else
-                {
+                } else {
                     building = buildings[indexPath.row]
                 }
                 
@@ -338,25 +295,18 @@ class MasterViewController: UITableViewController, CLLocationManagerDelegate, MG
 }
 
 
-extension MasterViewController: UISearchBarDelegate
-{
+extension MasterViewController: UISearchBarDelegate {
     // MARK: - UISearchBar Delegate
-    func searchBar(searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int)
-    {
+    func searchBar(searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         filterContentForSearchText(searchBar.text!, scope: searchBar.scopeButtonTitles![selectedScope])
     }
 }
 
-extension MasterViewController: UISearchResultsUpdating
-{
+extension MasterViewController: UISearchResultsUpdating {
     // MARK: - UISearchResultsUpdating Delegate
-    func updateSearchResultsForSearchController(searchController: UISearchController)
-    {
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
         let searchBar = searchController.searchBar
         let scope = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
         filterContentForSearchText(searchController.searchBar.text!, scope: scope)
     }
 }
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////
