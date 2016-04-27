@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:WakeNavs.xcodeproj">
+      location = "self:/Users/wfuloaner-mac01/Downloads/CandySearch/WakeNavs.xcodeproj">
    </FileRef>
 </Workspace>

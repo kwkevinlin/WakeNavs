@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "77209E681C9CFA870056A4FC"
+               BlueprintIdentifier = "171E0C791B8E5B84001E6242"
                BuildableName = "WakeNavs.app"
                BlueprintName = "WakeNavs"
                ReferencedContainer = "container:WakeNavs.xcodeproj">
@@ -32,7 +32,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "77209E681C9CFA870056A4FC"
+            BlueprintIdentifier = "171E0C791B8E5B84001E6242"
             BuildableName = "WakeNavs.app"
             BlueprintName = "WakeNavs"
             ReferencedContainer = "container:WakeNavs.xcodeproj">
@@ -55,7 +55,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "77209E681C9CFA870056A4FC"
+            BlueprintIdentifier = "171E0C791B8E5B84001E6242"
             BuildableName = "WakeNavs.app"
             BlueprintName = "WakeNavs"
             ReferencedContainer = "container:WakeNavs.xcodeproj">
@@ -74,7 +74,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "77209E681C9CFA870056A4FC"
+            BlueprintIdentifier = "171E0C791B8E5B84001E6242"
             BuildableName = "WakeNavs.app"
             BlueprintName = "WakeNavs"
             ReferencedContainer = "container:WakeNavs.xcodeproj">
