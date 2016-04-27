@@ -140,7 +140,7 @@
 				TargetAttributes = {
 					171E0C791B8E5B84001E6242 = {
 						CreatedOnToolsVersion = 7.0;
-						DevelopmentTeam = 9HU59Z4X44;
+						DevelopmentTeam = A2W7M425TE;
 						SystemCapabilities = {
 							com.apple.Maps.iOS = {
 								enabled = 0;
@@ -358,7 +358,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = WakeNavs/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = WakeNavs;
+				PRODUCT_BUNDLE_IDENTIFIER = me.linkevin.WakeNavs;
 				PRODUCT_NAME = WakeNavs;
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "WakeNavs/WakeNavs-Bridging-Header.h";
@@ -376,7 +376,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = WakeNavs/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = WakeNavs;
+				PRODUCT_BUNDLE_IDENTIFIER = me.linkevin.WakeNavs;
 				PRODUCT_NAME = WakeNavs;
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "WakeNavs/WakeNavs-Bridging-Header.h";
