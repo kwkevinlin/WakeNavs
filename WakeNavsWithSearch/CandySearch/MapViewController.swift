@@ -1,3 +1,11 @@
+//
+//  MapViewController.swift
+//  WakeNavs
+//
+//  Created by Kevin Lin on 4/26/16.
+//  Copyright © 2016 Kevin Lin. All rights reserved.
+//
+
 import UIKit
 import GoogleMaps
 import CoreLocation
@@ -11,33 +19,45 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     var locationManager = CLLocationManager()
     
     /*
-    Test coordinates:
-    Origin: 36.131648, -80.275542 (Collins)
-    Dest:   36.133349, -80.276640 (Manchester)
-    
-    Near [1]
-    36.131834, -80.275709
-    Near [2]
-    36.131931, -80.275800
-    Near [3]
-    36.132050, -80.275792
-    Near [4]
-    36.132314, -80.275765
-    Near [5]
-    36.132426, -80.275853
-    Near [6] (Major)
-    36.132574, -80.275999
-    Near [8]
-    36.132736, -80.276154
-    Near [9]
-    36.132831, -80.276253
-    Near [10]
-    36.133132, -80.276535
-    Near [11]
-    36.133216, -80.276618
-    Near End
-    36.133311, -80.276622
-    */
+     Test coordinates:
+     Origin: 36.131648, -80.275542 (Collins)
+     Dest:   36.133349, -80.276640 (Manchester)
+     
+     Near [1]
+     36.131834, -80.275709
+     Near [2]
+     36.131931, -80.275800
+     Near [3]
+     36.132050, -80.275792
+     Near [4]
+     36.132314, -80.275765
+     Near [5]
+     36.132426, -80.275853
+     Near [6] (Major)
+     36.132574, -80.275999
+     Near [8]
+     36.132736, -80.276154
+     Near [9]
+     36.132831, -80.276253
+     Near [10]
+     36.133132, -80.276535
+     Near [11]
+     36.133216, -80.276618
+     Near End
+     36.133311, -80.276622
+     
+     
+     Notes
+     1. Can probably simplify HTTP request, later
+     
+     Issues:
+     1. Initiate stepsIndex as 0, because if path is short (aka only one step), then locationManager will go out of index (trying to access stepsArr[1] when there is only one step (at [0]))
+     2. LocationManager remains to update even after going back to table view to reselect destination
+     
+     Fixes:
+     1. Padding is not the best yet. Priority for fix.
+ 
+     */
     
     var collins = CLLocationCoordinate2D(latitude: 36.131648, longitude: -80.275542)
     var manchester = CLLocationCoordinate2D(latitude: 36.133349, longitude: -80.276640)
@@ -64,13 +84,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //Setup for split view controller
-        setTitle()
+        //Update title and set destination
+        passedBuildingSetup()
         
         //Get Directions API key
         getAPIKey()
         
-        destination = manchester //Test
+        //destination = manchester //Test
         
         //locationManager.requestWhenInUseAuthorization()
         locationManager.delegate = self
@@ -90,15 +110,12 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     func setupMapView() {
         
-        //Setup navigation destination
-        destination = (detailBuilding?.loc)!
-        
         //Call Google Directions API for turn-by-turn navigataion
         callDirectionsAPI()
         
         /*
-            Must be some better way
-        */
+         Must be some better way
+         */
         while (true) {
             if (doneParse == true) {
                 
@@ -125,78 +142,15 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         //Adding markers to ALL coordinates for testing
         /*
-        for (var i = 0; i < pathCount; i++) {
-        markerArr.append(GMSMarker(position: path.coordinateAtIndex(UInt(i))))
-        markerArr[markerArr.count - 1].title = String(i)
-        markerArr[markerArr.count - 1].map = mapView
-        }
-        */
+         for (var i = 0; i < pathCount; i++) {
+         markerArr.append(GMSMarker(position: path.coordinateAtIndex(UInt(i))))
+         markerArr[markerArr.count - 1].title = String(i)
+         markerArr[markerArr.count - 1].map = mapView
+         }
+         */
         
         //Update polyline
         polyline.path = path
-        
-    }
-    
-    /*
-    Notes
-    1. Can probably simplify HTTP request, later
-    
-    Issues:
-    1. Initiate stepsIndex as 0, because if path is short (aka only one step), then locationManager will go out of index (trying to access stepsArr[1] when there is only one step (at [0]))
-    2. LocationManager remains to update even after going back to table view to reselect destination
-    
-    Fixes:
-    1. Padding is not the best yet. Priority for fix.
-    
-    */
-    
-    //Implement locationManager
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let location = locations[locations.count - 1]
-        
-        //Update map with current location
-        updateMap(location)
-        
-        /*
-        For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment pathIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
-        */
-        
-        //Replace polyline to start display from where you are
-        path.replaceCoordinateAtIndex(UInt(0), withCoordinate: CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude))
-        polyline.path = path
-        
-        //Get distance from current to next waypoint in path
-        let waypoint = CLLocation(latitude: path.coordinateAtIndex(UInt(1)).latitude, longitude: path.coordinateAtIndex(UInt(1)).longitude) //distanceFromLocation only takes CLLocation
-        let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
-        if (locToWaypoint != oldDist) { //Don't need to print everytime
-            print(locToWaypoint, ", path: ", pathIndex)
-            oldDist = locToWaypoint
-        }
-        
-        //If closer than 6 meters, change polyline to next waypoint
-        if (locToWaypoint < 6) {
-            //If not on last step
-            if (pathIndex < (pathCount - 1)) {
-                //Remove last path
-                //print("Removing: ", path.coordinateAtIndex(UInt(0)))
-                print("Removing path")
-                path.removeCoordinateAtIndex(UInt(0))
-                pathIndex++
-                
-                //If finishing current step, update instructions label
-                let nextPath = CLLocation(latitude: path.coordinateAtIndex(UInt(0)).latitude, longitude: path.coordinateAtIndex(UInt(0)).longitude)
-                let endOfCurrentStep = CLLocation(latitude: stepsArr[stepIndex-1].coordinates.latitude, longitude: stepsArr[stepIndex-1].coordinates.longitude)
-                let locToEndStep = endOfCurrentStep.distanceFromLocation(nextPath)
-                if (locToEndStep < 6) {
-                    print("Updating Instructions")
-                    updateInstructionsLabel(stepsArr[stepIndex].instructions)
-                    if (stepIndex + 1 < stepsArr.count) {
-                        stepIndex++
-                    }
-                }
-                
-            }
-        }
         
     }
     
@@ -221,11 +175,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                     let JSON = try NSJSONSerialization.JSONObjectWithData(data!, options:.AllowFragments)
                     
                     /*
-                    Returned JSON contains directions (NE, west..), distance, AND time for each step!
-                    
-                    Use this to see sample response:
-                    https://maps.googleapis.com/maps/api/directions/json?origin=36.131648,-80.275542&destination=36.133349,-80.276640&mode=walking&key="REPLACE SERVER KEY HERE"
-                    */
+                     Returned JSON contains directions (NE, west..), distance, AND time for each step!
+                     
+                     Use this to see sample response:
+                     https://maps.googleapis.com/maps/api/directions/json?origin=36.131648,-80.275542&destination=36.133349,-80.276640&mode=walking&key="REPLACE SERVER KEY HERE"
+                     */
                     
                     //Parse JSON
                     if let unwrappedStatus = JSON["status"] as? String {
@@ -278,17 +232,65 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
     }
     
-    @IBAction func lockMapButton(sender: AnyObject) {
-        if (mapLock == true) {
-            print("Unlocking map")
-            mapLock = false
-            lockMap.selected = false
-        } else {
-            print("Locking map")
-            mapLock = true
-            lockMap.selected = true
+    //Implement locationManager
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations[locations.count - 1]
+        
+        //Update map with current location
+        updateMap(location)
+        
+        /*
+         For each GPS update, check location of user against next waypoint on route. If distance within 6 meters (18 feet), increment pathIndex and now draw polyline from location to NEXT waypoint (if there is one), and start comparing user location to NEXT waypoint, etc.
+         */
+        
+        //Replace polyline to start display from where you are
+        path.replaceCoordinateAtIndex(UInt(0), withCoordinate: CLLocationCoordinate2DMake(location.coordinate.latitude, location.coordinate.longitude))
+        polyline.path = path
+        
+        //Get distance from current to next waypoint in path
+        let waypoint = CLLocation(latitude: path.coordinateAtIndex(UInt(1)).latitude, longitude: path.coordinateAtIndex(UInt(1)).longitude) //distanceFromLocation only takes CLLocation
+        let locToWaypoint = location.distanceFromLocation(waypoint) //Returns distance in meters
+        if (locToWaypoint != oldDist) { //Don't need to print everytime
+            print(locToWaypoint, ", path: ", pathIndex)
+            oldDist = locToWaypoint
         }
         
+        //If closer than 6 meters, change polyline to next waypoint
+        if (locToWaypoint < 6) {
+            //If not on last step
+            if (pathIndex < (pathCount - 1)) {
+                //Remove last path
+                //print("Removing: ", path.coordinateAtIndex(UInt(0)))
+                print("Removing path")
+                path.removeCoordinateAtIndex(UInt(0))
+                pathIndex++
+                
+                //If finishing current step, update instructions label
+                let nextPath = CLLocation(latitude: path.coordinateAtIndex(UInt(0)).latitude, longitude: path.coordinateAtIndex(UInt(0)).longitude)
+                let endOfCurrentStep = CLLocation(latitude: stepsArr[stepIndex-1].coordinates.latitude, longitude: stepsArr[stepIndex-1].coordinates.longitude)
+                let locToEndStep = endOfCurrentStep.distanceFromLocation(nextPath)
+                if (locToEndStep < 6) {
+                    print("Updating Instructions")
+                    updateInstructionsLabel(stepsArr[stepIndex].instructions)
+                    if (stepIndex + 1 < stepsArr.count) {
+                        stepIndex++
+                    }
+                }
+                
+            }
+        }
+    }
+
+    @IBAction func lockMapButton(sender: AnyObject) {
+        if (mapLock == true) {
+                        print("Unlocking map")
+                        mapLock = false
+                        lockMap.selected = false
+                    } else {
+                        print("Locking map")
+                        mapLock = true
+                        lockMap.selected = true
+        }
     }
     
     func updateMap(coord: CLLocation) {
@@ -317,11 +319,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
     }
     
-    
     func updateInstructionsLabel(instruction: String) {
-        /*
-        Currently displaying HTML strings as just plain text
-        */
+        
+        //Currently displaying HTML strings as just plain text
         let encodedData = instruction.dataUsingEncoding(NSUTF8StringEncoding)!
         var attributedString: NSAttributedString?
         
@@ -345,18 +345,23 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     var detailBuilding: Building? {
         didSet {
-            setTitle()
+            passedBuildingSetup()
         }
     }
     
-    func setTitle() {
+    func passedBuildingSetup() {
         if let detailBuilding = detailBuilding {
+            //Nav bar title
             title = detailBuilding.name
+            
+            //Setup navigation destination
+            destination = detailBuilding.loc
         }
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
-    
+
 }
