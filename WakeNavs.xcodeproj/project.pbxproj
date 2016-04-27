@@ -85,8 +85,7 @@
 				2BE72C281CD042EB0050558B /* keys.plist */,
 				2B1A30851CCF017B003B56E5 /* WakeNavs-Bridging-Header.h */,
 			);
-			name = WakeNavs;
-			path = CandySearch;
+			path = WakeNavs;
 			sourceTree = "<group>";
 		};
 		58563E680AA4B835D730F9AC /* Pods */ = {
@@ -357,12 +356,12 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				INFOPLIST_FILE = CandySearch/Info.plist;
+				INFOPLIST_FILE = WakeNavs/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = WakeNavs;
 				PRODUCT_NAME = WakeNavs;
 				PROVISIONING_PROFILE = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "CandySearch/WakeNavs-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "WakeNavs/WakeNavs-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -375,12 +374,12 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				INFOPLIST_FILE = CandySearch/Info.plist;
+				INFOPLIST_FILE = WakeNavs/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = WakeNavs;
 				PRODUCT_NAME = WakeNavs;
 				PROVISIONING_PROFILE = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "CandySearch/WakeNavs-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "WakeNavs/WakeNavs-Bridging-Header.h";
 			};
 			name = Release;
 		};
