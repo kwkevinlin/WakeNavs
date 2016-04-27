@@ -11,13 +11,11 @@ import UIKit
 class DetailViewController: UIViewController {
     
     @IBOutlet weak var webView: UIWebView!
-    @IBOutlet weak var detailDescriptionLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureView()
-        detailDescriptionLabel.hidden = true
     }
     
     var detailBuilding: Building? {
@@ -28,15 +26,17 @@ class DetailViewController: UIViewController {
     
     func configureView() {
         if let detailBuilding = detailBuilding {
-            if let detailDescriptionLabel = detailDescriptionLabel {
-                
-                detailDescriptionLabel.text = detailBuilding.name
+            if let webView = webView {
+            
+                //Set Nav Bar title
                 title = detailBuilding.name
                 
                 //Load webView
                 let url = NSURL(string: detailBuilding.detailURL);
                 let requestObj = NSURLRequest(URL: url!);
                 webView.loadRequest(requestObj);
+                
+                //Notice UIWebView in Storyboard. Is it suppose to be whole screen? (Upper section encapsulates nav bar)
             }
         }
     }
