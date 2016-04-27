@@ -53,9 +53,12 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
      Issues:
      1. Initiate stepsIndex as 0, because if path is short (aka only one step), then locationManager will go out of index (trying to access stepsArr[1] when there is only one step (at [0]))
      2. LocationManager remains to update even after going back to table view to reselect destination
+     3. Major: Because we're using MGSwipe library, if we don't click row before clicking swipping buttons, app will crash because detailBuilding will return nil. Library documentation not sufficient, check again.
+     4. If we are driving, 6 meters distance will not be enough since cars are fast
+     5. If we miss a waypoint, we have to go back (ie, can never deviate off path). Possible fix: every X steps, check (with hash for fast lookup) to see which waypoint is closest, then base off on that.
      
      Fixes:
-     1. Padding is not the best yet. Priority for fix.
+     1. Padding is not ideal yet.
  
      */
     
@@ -68,7 +71,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     var path = GMSMutablePath() //Array of CLLocationCoordinate2D
     var polyline = GMSPolyline()
-    var markerArr = [GMSMarker]()
     var stepsArr = [Steps]() //Each step
     
     var doneParse = false
@@ -128,7 +130,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                 }
                 
                 //Update instructions label
-                updateInstructionsLabel(stepsArr[0].instructions)
+                if (stepsArr.count == 0) {
+                    //Location not updating or did not "select then click"
+                    print("Error in update instructions label")
+                    updateInstructionsLabel("Please check your GPS signal")
+                } else {
+                    updateInstructionsLabel(stepsArr[0].instructions)
+                }
                 
                 //Put marker on destination
                 updateDestMarker(destination)
@@ -140,15 +148,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         //Update total number of coordinates in path
         pathCount = Int(path.count())
         
-        //Adding markers to ALL coordinates for testing
-        /*
-         for (var i = 0; i < pathCount; i++) {
-         markerArr.append(GMSMarker(position: path.coordinateAtIndex(UInt(i))))
-         markerArr[markerArr.count - 1].title = String(i)
-         markerArr[markerArr.count - 1].map = mapView
-         }
-         */
-        
         //Update polyline
         polyline.path = path
         
@@ -159,8 +158,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         //If building navigation, then mode = walking. Else if visitor parking, mode = driving
         var transportationMode: String  = ""
         //Note: this section will crash if "didn't click row then select"
-        if (detailBuilding!.name == "Visitor Parking @ Welcome Center" || detailBuilding!.name == "Visitor Parking @ Upper Quad" || detailBuilding!.name == "Visitor Parking @ Benson") {
-        } else {
+        if (detailBuilding!.name != "Visitor Parking @ Welcome Center" && detailBuilding!.name != "Visitor Parking @ Upper Quad" && detailBuilding!.name != "Visitor Parking @ Benson") {
             transportationMode = "&mode=walking"
         }
         
