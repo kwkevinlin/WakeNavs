@@ -35,7 +35,7 @@ class DetailViewController: UIViewController
             {
                 
                 detailDescriptionLabel.text = detailBuilding.name
-                title = detailBuilding.keyWords[0]
+                title = detailBuilding.name
                 theURL = detailBuilding.detailURL
                 
                 // Do any additional setup after loading the view, typically from a nib.
