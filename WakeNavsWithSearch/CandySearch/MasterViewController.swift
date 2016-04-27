@@ -1,3 +1,11 @@
+//
+//  MasterViewController.swift
+//  WakeNavs
+//
+//  Created by Kevin Lin on 4/26/16.
+//  Copyright © 2016 Kevin Lin. All rights reserved.
+//
+
 import UIKit
 import CoreLocation
 
@@ -135,7 +143,13 @@ class MasterViewController: UITableViewController, CLLocationManagerDelegate, MG
                 
                 Building(myName:"Worrell Professional Center",myKeyWords:["School of Law"],myLatitude: 36.137184, myLongtitude: -80.274858, myCatogory: "Academic", myURL: "https://zsr.wfu.edu/special/exhibit/wfu-buildings-and-roads/worrell-professional-center/"),
                 
-                Building(myName:"Z. Smith Reynolds Library",myKeyWords:["Starbucks", "The Bridge", "Mac Lab", "Auditorium Rooms"],myLatitude: 36.131771, myLongtitude: -80.278315, myCatogory: "Academic", myURL: "https://zsr.wfu.edu/special/exhibit/wfu-buildings-and-roads/z-smith-reynolds-library/")
+                Building(myName:"Z. Smith Reynolds Library",myKeyWords:["Starbucks", "The Bridge", "Mac Lab", "Auditorium Rooms"],myLatitude: 36.131771, myLongtitude: -80.278315, myCatogory: "Academic", myURL: "https://zsr.wfu.edu/special/exhibit/wfu-buildings-and-roads/z-smith-reynolds-library/"),
+                
+                Building(myName:"Visitor Parking @ Welcome Center",myKeyWords:["Admissions Office","Lot S1 S2"],myLatitude: 36.131070, myLongtitude:  -80.283558, myCatogory: "Other", myURL: "http://www.wfu.edu/visitors"),
+                
+                Building(myName:"Visitor Parking @ Upper Quad",myKeyWords:["Wait Chapel Parking","Lot N"],myLatitude: 36.134807,  myLongtitude:  -80.277450, myCatogory: "Other", myURL: "http://www.wfu.edu/visitors"),
+                
+                Building(myName:"Visitor Parking @ Benson",myKeyWords:["Benson Parking","Lot C","Post Office"],myLatitude: 36.133167,   myLongtitude:  -80.278256, myCatogory: "Other", myURL: "http://www.wfu.edu/visitors")
         ]
         
         

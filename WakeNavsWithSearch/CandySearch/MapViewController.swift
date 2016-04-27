@@ -155,7 +155,16 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     }
     
     func callDirectionsAPI() {
-        let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(origin.latitude),\(origin.longitude)&destination=\(destination.latitude),\(destination.longitude)&mode=walking&key=\(ServerAPIKey)"
+        
+        //If building navigation, then mode = walking. Else if visitor parking, mode = driving
+        var transportationMode: String  = ""
+        //Note: this section will crash if "didn't click row then select"
+        if (detailBuilding!.name == "Visitor Parking @ Welcome Center" || detailBuilding!.name == "Visitor Parking @ Upper Quad" || detailBuilding!.name == "Visitor Parking @ Benson") {
+        } else {
+            transportationMode = "&mode=walking"
+        }
+        
+        let endpoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(origin.latitude),\(origin.longitude)&destination=\(destination.latitude),\(destination.longitude)\(transportationMode)&key=\(ServerAPIKey)"
         
         //Make HTTP request
         let requestURL: NSURL = NSURL(string: endpoint)!
