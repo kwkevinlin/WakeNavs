@@ -58,7 +58,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
      5. If we miss a waypoint, we have to go back (ie, can never deviate off path). Possible fix: every X steps, check (with hash for fast lookup) to see which waypoint is closest, then base off on that.
      
      Fixes:
-     1. Padding is not ideal yet.
+     1. Padding is not the best yet.
  
      */
     
@@ -81,8 +81,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     var oldDist: CLLocationDistance = 0.0
     var pathCount: Int = 0
     
-    var passedValue: String = ""
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -91,8 +89,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         //Get Directions API key
         getAPIKey()
-        
-        //destination = manchester //Test
         
         //locationManager.requestWhenInUseAuthorization()
         locationManager.delegate = self
@@ -188,7 +184,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                      https://maps.googleapis.com/maps/api/directions/json?origin=36.131648,-80.275542&destination=36.133349,-80.276640&mode=walking&key="REPLACE SERVER KEY HERE"
                      */
                     
-                    //Parse JSON
+                    //Parse JSON (messy)
                     if let unwrappedStatus = JSON["status"] as? String {
                         //If response is successful from Google
                         if unwrappedStatus == "OK" {
@@ -201,21 +197,21 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                                     
                                     //Add coordinates path, instead of using encoded polyline
                                     if let coorLat = step["end_location"]!["lat"] as? Double {                                        if let coorLong = step["end_location"]!["lng"] as? Double {
-                                        if let dist = step["distance"]!["value"] as? Int {
-                                            if let dur = step["duration"]!["value"] as? Int {
-                                                if let instructions = step["html_instructions"] as? String {
-                                                    if let encPoly = step["polyline"]!["points"] as? String {
-                                                        //Storing to stepsArr
-                                                        self.stepsArr.append(Steps(dur: dur, dist: dist, coor: CLLocationCoordinate2DMake(coorLat, coorLong), poly: encPoly, inst: instructions))
+                                            if let dist = step["distance"]!["value"] as? Int {
+                                                if let dur = step["duration"]!["value"] as? Int {
+                                                    if let instructions = step["html_instructions"] as? String {
+                                                        if let encPoly = step["polyline"]!["points"] as? String {
+                                                            //Storing to stepsArr
+                                                            self.stepsArr.append(Steps(dur: dur, dist: dist, coor: CLLocationCoordinate2DMake(coorLat, coorLong), poly: encPoly, inst: instructions))
                                                         
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
-                                        }
                                     }
                                     
-                                } //End step loop
+                                } //End steps loop
                             }
                             
                         } else {
@@ -290,13 +286,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
 
     @IBAction func lockMapButton(sender: AnyObject) {
         if (mapLock == true) {
-                        print("Unlocking map")
-                        mapLock = false
-                        lockMap.selected = false
-                    } else {
-                        print("Locking map")
-                        mapLock = true
-                        lockMap.selected = true
+            print("Unlocking map")
+            mapLock = false
+            lockMap.selected = false
+        } else {
+            print("Locking map")
+            mapLock = true
+            lockMap.selected = true
         }
     }
     
@@ -305,7 +301,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         if (mapLock == true) {
             //If polyline is present, update mapView with padding
             if (Int(path.count()) > 0) {
-                let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 85.0)
+                let pathBound = GMSCameraUpdate.fitBounds(GMSCoordinateBounds.init(path: path), withPadding: 70.0)
                 mapView.moveCamera(pathBound)
             }
         }
@@ -323,7 +319,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             
             ServerAPIKey = GoogleAPI!
         }
-        
     }
     
     func updateInstructionsLabel(instruction: String) {
@@ -358,7 +353,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     func passedBuildingSetup() {
         if let detailBuilding = detailBuilding {
-            //Nav bar title
+            //Set Nav Bar title
             title = detailBuilding.name
             
             //Setup navigation destination
